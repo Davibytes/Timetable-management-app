@@ -1,10 +1,8 @@
-﻿# Timetable-management-app
-
-Timetable Management System
+﻿# Timetable Management System
 
 A full-stack web application built with ReactJS and Node.js for generating and managing timetables. This project aims to provide an efficient and user-friendly solution for creating, editing, and organizing timetables.
 
-Features:
+## Features:
 
 - Generate timetables based on user input parameters
 - Manage timetables (create, edit, delete)
@@ -12,64 +10,75 @@ Features:
 - User-friendly interface with ReactJS frontend
 - RESTful API with Node.js backend
 
-Tech Stack:
+## Tech Stack:
+### Frontend
+- React 18+ Vite
+- Tailwind CSS
 
-- Frontend: ReactJS
-- Backend: Node.js
-- Database: MongoDB
+### Backend
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT Authentication
+- Bycrypt password hashing
+- Joi validation
 
-Installations
+## Installations
+- Node.js 18+
+- MongoDB 6+
+- npm package manager
 
-Node.js
-MongoDB
-npm package manager
-Git
-1. Clone Repository
+
+### 1. Clone Repository
    git clone https://github.com/Davibyte/Timetable-management-app.git
-2. Backend Setup
-   # Navigate to server directory
-   cd server
 
-   # Install dependencies
-   npm install
+### 2. Backend Setup
+```bash
+# Navigate to backend directory
+cd server
 
-   # Create .env file
-   touch .env
+# Install dependencies
+npm install
 
-   # Add environment variables (contact team)
-   # Start MongoDB
-   mongosh
+# Create .env file
+cp .env.example .env
 
-   # Seed default categories
-   node scripts/createDefaultCategories.js
+# Update .env with your values (contact team)
+# Start MongoDB service
 
-   # Start server
-   npm run dev
+# Run server
+npm run dev
+```
 Server will run on http://localhost:5000
 
-3. Frontend Setup
-   # Open new terminal
-   # Navigate to client directory
-   cd client
+### 3. Frontend Setup
+```bash
+# Navigate to frontend directory
+cd client
 
-   # Install dependencies
-   npm install
+# Install dependencies
+npm install
 
-   # Create .env file
-   touch .env
+# Create .env file
+cp .env.example .env
 
-   # Add environment variables (contact team)
+# Update VITE_API_URL if needed
 
-   # Start development server
-   npm start
-Client will run on http://localhost:3000
+# Run development server
+npm run dev
+```
+Client will run on http://localhost:57173
 
-Team
+### API Documentation
+Full API documentation is available on Postman:
+**[Full API Documentation (Postman)](https://documenter.getpostman.com/view/49640730/2sB3dJzCfL)**
+
+### Project Structure (TO-DO)
+
+### Team
 Samantha Ngong @SamanthaNK
 Davida Assene @Davibyte
 Pearly Kusona @Pearly-Kusona25
 Bless Nsango @NsangoBless
-Status:
+
+### Status:
 Project currently under development.
-
-
