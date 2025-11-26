@@ -1,7 +1,8 @@
 const User = require('../models/userModel');
-const { getRedisClient } = require('../config/redis');
-const { sendVerificationEmail, sendPasswordResetEmail } = require('../services/emailService');
 const crypto = require('crypto');
+
+// Token storage - replace with Redis later
+const tokenStore = new Map();
 
 // Register new user
 exports.register = async (req, res) => {
@@ -24,26 +25,13 @@ exports.register = async (req, res) => {
             email,
             password,
             role: role || 'student',
-            department
+            department,
+            isActive: true
         });
-
-        // Generate email verification token
-        const verificationToken = crypto.randomBytes(32).toString('hex');
-        const hashedToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
-
-        // Store verification token in Redis (expires in 1 hour)
-        await getRedisClient().setEx(
-            `verify:${hashedToken}`,
-            3600,
-            user._id.toString()
-        );
-
-        // Send verification email
-        await sendVerificationEmail(user.email, verificationToken);
 
         res.status(201).json({
             success: true,
-            message: 'Registration successful. Please check your email to verify your account.',
+            message: 'Registration successful. You can now login.',
             data: {
                 user: {
                     id: user._id,
@@ -59,50 +47,6 @@ exports.register = async (req, res) => {
         res.status(500).json({
             success: false,
             message: error.message || 'Registration failed'
-        });
-    }
-};
-
-// Verify Email
-exports.verifyEmail = async (req, res) => {
-    try {
-        const { token } = req.params;
-        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
-        // Check if token exists in Redis
-        const userId = await getRedisClient().get(`verify:${hashedToken}`);
-
-        if (!userId) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid or expired verification token'
-            });
-        }
-
-        // Update user as verified
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-
-        user.isActive = true;
-        await user.save();
-
-        // Delete verification token from Redis
-        await getRedisClient().del(`verify:${hashedToken}`);
-
-        res.status(200).json({
-            success: true,
-            message: 'Email verified successfully. You can now login.'
-        });
-    } catch (error) {
-        console.error('Verify email error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Email verification failed'
         });
     }
 };
@@ -133,7 +77,7 @@ exports.login = async (req, res) => {
         if (!user.isActive) {
             return res.status(401).json({
                 success: false,
-                message: 'Please verify your email before logging in'
+                message: 'Your account has been deactivated'
             });
         }
 
@@ -153,16 +97,13 @@ exports.login = async (req, res) => {
         // Generate token
         const token = user.generateToken();
 
-        // Cache user session in Redis (expires in 7 days)
-        await getRedisClient().setEx(
-            `session:${user._id}`,
-            604800,
-            JSON.stringify({
-                id: user._id,
-                email: user.email,
-                role: user.role
-            })
-        );
+        // Store session in memory
+        tokenStore.set(user._id.toString(), {
+            id: user._id,
+            email: user.email,
+            role: user.role,
+            timestamp: Date.now()
+        });
 
         res.status(200).json({
             success: true,
@@ -188,12 +129,11 @@ exports.login = async (req, res) => {
     }
 };
 
-
 // Logout user
 exports.logout = async (req, res) => {
     try {
-        // Remove session from Redis
-        await getRedisClient().del(`session:${req.user._id}`);
+        // Remove session from memory
+        tokenStore.delete(req.user._id.toString());
 
         res.status(200).json({
             success: true,
@@ -222,29 +162,32 @@ exports.forgotPassword = async (req, res) => {
         }
 
         // Generate reset token
-        const resetToken = user.getResetToken();
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+        user.passwordResetToken = hashedToken;
+        user.passwordResetExpires = Date.now() + 3600000; // 1 hour
         await user.save();
 
-        // Store reset token in Redis (expires in 1 hour)
-        const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-        await getRedisClient().setEx(
-            `reset:${hashedToken}`,
-            3600,
-            user._id.toString()
-        );
+        // Store in memory
+        tokenStore.set(`reset:${hashedToken}`, {
+            userId: user._id.toString(),
+            expires: Date.now() + 3600000
+        });
 
-        // Send reset email
-        await sendPasswordResetEmail(user.email, resetToken);
+        // Implement email later
+        console.log('Reset token:', resetToken);
 
         res.status(200).json({
             success: true,
-            message: 'Password reset link sent to your email'
+            message: 'Password reset token generated',
+            resetToken
         });
     } catch (error) {
         console.error('Forgot password error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to send reset email'
+            message: 'Failed to generate reset token'
         });
     }
 };
@@ -264,10 +207,9 @@ exports.resetPassword = async (req, res) => {
 
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-        // Check if token exists in Redis
-        const userId = await getRedisClient().get(`reset:${hashedToken}`);
-
-        if (!userId) {
+        // Check token in memory
+        const tokenData = tokenStore.get(`reset:${hashedToken}`);
+        if (!tokenData || tokenData.expires < Date.now()) {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid or expired reset token'
@@ -275,7 +217,7 @@ exports.resetPassword = async (req, res) => {
         }
 
         // Find user and update password
-        const user = await User.findById(userId);
+        const user = await User.findById(tokenData.userId);
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -288,12 +230,12 @@ exports.resetPassword = async (req, res) => {
         user.passwordResetExpires = undefined;
         await user.save();
 
-        // Delete reset token from Redis
-        await getRedisClient().del(`reset:${hashedToken}`);
+        // Delete reset token
+        tokenStore.delete(`reset:${hashedToken}`);
 
         res.status(200).json({
             success: true,
-            message: 'Password reset successful. You can now login with your new password.'
+            message: 'Password reset successful. You can now login.'
         });
     } catch (error) {
         console.error('Reset password error:', error);
@@ -304,15 +246,14 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
+// Get current user
 exports.getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
 
         res.status(200).json({
             success: true,
-            data: {
-                user
-            }
+            data: { user }
         });
     } catch (error) {
         console.error('Get me error:', error);

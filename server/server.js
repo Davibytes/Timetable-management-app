@@ -2,27 +2,28 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const { connectRedis } = require('./src/config/redis');
 
 const app = express();
 
-// Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to database
-mongoose.connect(process.env.MONGODB_URI)
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/timetable-app')
   .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.error('MongoDB Error:', err));
+  .catch(err => {
+    console.error('MongoDB Error:', err);
+    process.exit(1);
+  });
 
 // API Routes
 app.use('/api/auth', require('./src/routes/authRoutes'));
 
-// Health check route
+// Health check
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -31,9 +32,17 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Error handler
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found'
+  });
+});
+
+// Global error handler
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error('Error:', err);
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Server Error'
@@ -43,15 +52,9 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 5000;
 
-const startServer = async () => {
-  await connectRedis();
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Frontend URL: ${process.env.CLIENT_URL}`);
-  });
-};
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Frontend URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+});
 
 module.exports = app;

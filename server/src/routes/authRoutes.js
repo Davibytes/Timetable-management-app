@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const {
     register,
-    verifyEmail,
     login,
     logout,
     forgotPassword,
@@ -10,13 +9,18 @@ const {
     getMe
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
+const {
+    validateRegister,
+    validateLogin,
+    validateForgotPassword,
+    validateResetPassword
+} = require('../middleware/validationMiddleware');
 
 // Public routes
-router.post('/register', register);
-router.get('/verify-email/:token', verifyEmail);
-router.post('/login', login);
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password/:token', resetPassword);
+router.post('/register', validateRegister, register);
+router.post('/login', validateLogin, login);
+router.post('/forgot-password', validateForgotPassword, forgotPassword);
+router.post('/reset-password/:token', validateResetPassword, resetPassword);
 
 // Protected routes
 router.post('/logout', protect, logout);
