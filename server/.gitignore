@@ -19,6 +19,7 @@ cache/
 
 # Environment files
 .env
+documentation/*.md
 
 # dependencies
 /node_modules

@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Calendar, Mail, Lock, User, Building, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, Building, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Toast';
+import { useTheme } from '../context/ThemeContext';
+import ChronosLogo from '../components/ChronosLogo';
+import Input from '../components/Input';
+import Button from '../components/Button';
+import ThemeToggle from '../components/ThemeToggle';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
     const { register } = useAuth();
     const toast = useToast();
+    const { isDark } = useTheme();
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -17,7 +23,6 @@ const RegisterPage = () => {
         role: 'student',
         department: ''
     });
-    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
@@ -26,172 +31,201 @@ const RegisterPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (formData.password.length < 6) {
+            toast.error('Password must be at least 6 characters long');
+            return;
+        }
+
         setLoading(true);
 
         try {
             await register(formData);
-            toast.success('Registration successful! Please login.');
-            navigate('/login');
+            toast.success('Registration successful! Please login to continue.');
+            setTimeout(() => navigate('/login'), 1500);
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Registration failed');
+            toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-onyx flex items-center justify-center px-6 py-12">
-            <div className="w-full max-w-2xl">
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <Link to="/" className="inline-flex items-center gap-2 mb-6">
-                        <Calendar className="w-10 h-10 text-strawberry_red" />
-                        <span className="text-2xl font-semibold text-white_smoke">Timetable System</span>
+        <div className="min-h-screen flex flex-col lg:flex-row">
+            {/* Left Side - Branding */}
+            <div
+                className={`lg:w-1/2 flex flex-col items-center justify-center p-8 lg:p-12 ${isDark ? 'bg-dark-canvas' : 'bg-light-canvas'
+                    }`}
+            >
+                <div className="max-w-md w-full text-center">
+                    <ChronosLogo size="hero" showTagline={true} />
+
+                    {/* Decorative Large Grid Blocks */}
+                    <div className="mt-16 grid grid-cols-5 gap-3 max-w-xs mx-auto">
+                        {/* Row 1 */}
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-indigo/30' : 'bg-sage/20'} blur-[2px] opacity-70`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-dark-surface' : 'bg-light-elevated'} blur-[2px] opacity-60`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-indigo/30' : 'bg-sage/20'} blur-[2px] opacity-70`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-dark-surface' : 'bg-light-elevated'} blur-[2px] opacity-60`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-indigo/30' : 'bg-sage/20'} blur-[2px] opacity-70`}></div>
+
+                        {/* Row 2 */}
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-dark-surface' : 'bg-light-elevated'} blur-[2px] opacity-60`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-indigo/30' : 'bg-sage/20'} blur-[2px] opacity-70`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-dark-surface' : 'bg-light-elevated'} blur-[2px] opacity-60`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-indigo/30' : 'bg-sage/20'} blur-[2px] opacity-70`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-dark-surface' : 'bg-light-elevated'} blur-[2px] opacity-60`}></div>
+
+                        {/* Row 3 */}
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-dark-surface' : 'bg-light-elevated'} blur-[2px] opacity-60`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-indigo/30' : 'bg-sage/20'} blur-[2px] opacity-70`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-dark-surface' : 'bg-light-elevated'} blur-[2px] opacity-60`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-dark-surface' : 'bg-light-elevated'} blur-[2px] opacity-60`}></div>
+                        <div className={`h-16 rounded-button ${isDark ? 'bg-indigo/30' : 'bg-sage/20'} blur-[2px] opacity-70`}></div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Side - Register Form */}
+            <div
+                className={`lg:w-1/2 flex flex-col ${isDark ? 'bg-dark-surface' : 'bg-light-surface'
+                    }`}
+            >
+                {/* Theme Toggle & Back Button */}
+                <div className="flex justify-between items-center p-6">
+                    <Link
+                        to="/"
+                        className={`flex items-center gap-2 text-small transition-smooth ${isDark
+                                ? 'text-text-dark-secondary hover:text-text-dark-primary'
+                                : 'text-text-light-secondary hover:text-text-light-primary'
+                            }`}
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Home
                     </Link>
-                    <h1 className="text-3xl font-bold text-white_smoke mb-2">Create Account</h1>
-                    <p className="text-silver">Join to start managing schedules</p>
+                    <ThemeToggle />
                 </div>
 
-                {/* Form Card */}
-                <div className="bg-carbon_black border border-silver-900/20 rounded-lg p-8">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Name Fields */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-white_smoke mb-2">
-                                    First Name
-                                </label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-silver" />
-                                    <input
-                                        type="text"
-                                        name="firstName"
-                                        value={formData.firstName}
-                                        onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 bg-onyx border border-silver-900/20 rounded-lg text-white_smoke focus:outline-none focus:border-strawberry_red transition-all duration-300"
-                                        placeholder="Namjoon"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-white_smoke mb-2">
-                                    Last Name
-                                </label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-silver" />
-                                    <input
-                                        type="text"
-                                        name="lastName"
-                                        value={formData.lastName}
-                                        onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 bg-onyx border border-silver-900/20 rounded-lg text-white_smoke focus:outline-none focus:border-strawberry_red transition-all duration-300"
-                                        placeholder="Kim"
-                                        required
-                                    />
-                                </div>
-                            </div>
+                {/* Form Container */}
+                <div className="flex-1 flex items-center justify-center px-6 py-12">
+                    <div className="w-full max-w-md">
+                        <div className="mb-8">
+                            <h1
+                                className={`text-h1 font-comfortaa font-semibold mb-2 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
+                                    }`}
+                            >
+                                Create Account
+                            </h1>
+                            <p
+                                className={`text-body ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'
+                                    }`}
+                            >
+                                Join to start managing schedules
+                            </p>
                         </div>
 
-                        {/* Email */}
-                        <div>
-                            <label className="block text-sm font-medium text-white_smoke mb-2">
-                                Email Address
-                            </label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-silver" />
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <Input
+                                    label="First Name"
+                                    type="text"
+                                    name="firstName"
+                                    value={formData.firstName}
                                     onChange={handleChange}
-                                    className="w-full pl-10 pr-4 py-3 bg-onyx border border-silver-900/20 rounded-lg text-white_smoke focus:outline-none focus:border-strawberry_red transition-all duration-300"
-                                    placeholder="your.email@example.com"
+                                    placeholder="Kim"
+                                    icon={<User className="w-5 h-5" />}
+                                    required
+                                />
+
+                                <Input
+                                    label="Last Name"
+                                    type="text"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                    placeholder="Namjoon"
+                                    icon={<User className="w-5 h-5" />}
                                     required
                                 />
                             </div>
-                        </div>
 
-                        {/* Password */}
-                        <div>
-                            <label className="block text-sm font-medium text-white_smoke mb-2">
-                                Password
-                            </label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-silver" />
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    className="w-full pl-10 pr-12 py-3 bg-onyx border border-silver-900/20 rounded-lg text-white_smoke focus:outline-none focus:border-strawberry_red transition-all duration-300"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-silver hover:text-white_smoke"
-                                >
-                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </button>
-                            </div>
-                            <p className="text-xs text-silver mt-1">Minimum 6 characters</p>
-                        </div>
+                            <Input
+                                label="Email"
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="your.email@example.com"
+                                icon={<Mail className="w-5 h-5" />}
+                                required
+                            />
 
-                        {/* Role & Department */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-white_smoke mb-2">
-                                    Role
-                                </label>
-                                <select
-                                    name="role"
-                                    value={formData.role}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-onyx border border-silver-900/20 rounded-lg text-white_smoke focus:outline-none focus:border-strawberry_red transition-all duration-300"
-                                >
-                                    <option value="student">Student</option>
-                                    <option value="lecturer">Lecturer</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
+                            <Input
+                                label="Password"
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="Minimum 6 characters"
+                                icon={<Lock className="w-5 h-5" />}
+                                required
+                            />
 
-                            <div>
-                                <label className="block text-sm font-medium text-white_smoke mb-2">
-                                    Department
-                                </label>
-                                <div className="relative">
-                                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-silver" />
-                                    <input
-                                        type="text"
-                                        name="department"
-                                        value={formData.department}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        className={`block text-small font-medium mb-2 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
+                                            }`}
+                                    >
+                                        Role <span className={isDark ? 'text-semantic-dark-error' : 'text-semantic-light-error'}>*</span>
+                                    </label>
+                                    <select
+                                        name="role"
+                                        value={formData.role}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 bg-onyx border border-silver-900/20 rounded-lg text-white_smoke focus:outline-none focus:border-strawberry_red transition-all duration-300"
-                                        placeholder="Computer Science"
-                                    />
+                                        className={`w-full px-4 py-3 rounded-input border transition-smooth ${isDark
+                                                ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary focus-ring-dark'
+                                                : 'bg-light-surface border-light-border-subtle text-text-light-primary focus-ring-light'
+                                            }`}
+                                        required
+                                    >
+                                        <option value="student">Student</option>
+                                        <option value="lecturer">Lecturer</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
                                 </div>
-                            </div>
-                        </div>
 
-                        {/* Submit Button */}
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-3 bg-mahogany_red-500 text-white_smoke rounded-lg font-medium hover:bg-mahogany_red-600 transition-all duration-300 disabled:opacity-50"
+                                <Input
+                                    label="Department"
+                                    type="text"
+                                    name="department"
+                                    value={formData.department}
+                                    onChange={handleChange}
+                                    placeholder="Computer Science"
+                                    icon={<Building className="w-5 h-5" />}
+                                />
+                            </div>
+
+                            <Button type="submit" variant="primary" fullWidth disabled={loading}>
+                                {loading ? 'Creating Account...' : 'Create Account'}
+                            </Button>
+                        </form>
+
+                        <div
+                            className={`mt-6 text-center text-small ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'
+                                }`}
                         >
-                            {loading ? 'Creating Account...' : 'Create Account'}
-                        </button>
-                    </form>
-
-                    {/* Login Link */}
-                    <div className="mt-6 text-center text-sm text-silver">
-                        Already have an account?{' '}
-                        <Link to="/login" className="text-strawberry_red hover:opacity-80">
-                            Sign In
-                        </Link>
+                            Already have an account?{' '}
+                            <Link
+                                to="/login"
+                                className={`font-medium transition-smooth ${isDark
+                                        ? 'text-indigo-light hover:text-indigo'
+                                        : 'text-sage hover:text-sage-dark'
+                                    }`}
+                            >
+                                Sign In
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>

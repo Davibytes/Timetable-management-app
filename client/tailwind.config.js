@@ -1,130 +1,140 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
+    "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        onyx: {
-          DEFAULT: '#0b090a',
-          100: '#020202',
-          200: '#040404',
-          300: '#070606',
-          400: '#090708',
-          500: '#0b090a',
-          600: '#41353b',
-          700: '#77616c',
-          800: '#a7939d',
-          900: '#d3c9ce'
+        // Dark Mode Colors
+        dark: {
+          canvas: '#0a0a0a',
+          surface: '#1a1a1a',
+          elevated: '#222222',
+          border: {
+            subtle: '#2a2a2a',
+            prominent: '#3a3a3a',
+          }
         },
-
-        carbon_black: {
-          DEFAULT: '#161a1d',
-          100: '#040506',
-          200: '#090a0c',
-          300: '#0d1011',
-          400: '#121517',
-          500: '#161a1d',
-          600: '#3d4951',
-          700: '#657786',
-          800: '#96a5b0',
-          900: '#cbd2d8'
+        // Light Mode Colors
+        light: {
+          canvas: '#faf9f5',
+          surface: '#ffffff',
+          elevated: '#e8ebe6',
+          border: {
+            subtle: '#e8ebe6',
+            prominent: '#d0d3ce',
+          }
         },
-
-        dark_garnet: {
-          DEFAULT: '#660708',
-          100: '#140102',
-          200: '#280303',
-          300: '#3c0405',
-          400: '#500607',
-          500: '#660708',
-          600: '#af0c0f',
-          700: '#ef1d20',
-          800: '#f5686b',
-          900: '#fab4b5'
+        // Accent Colors (Dark)
+        indigo: {
+          DEFAULT: '#6731b7',
+          velvet: '#523e93',
+          light: '#9975cd',
         },
-
-        mahogany_red: {
-          DEFAULT: '#ba181b',
-          100: '#250505',
-          200: '#4a0a0b',
-          300: '#6f0e10',
-          400: '#941315',
-          500: '#ba181b',
-          600: '#e32a2d',
-          700: '#ea5f62',
-          800: '#f19496',
-          900: '#f8cacb'
+        // Accent Colors (Light)
+        sage: {
+          DEFAULT: '#5a7a5f',
+          dark: '#4a6a50',
         },
-
-        strawberry_red: {
-          DEFAULT: '#e5383b',
-          100: '#330707',
-          200: '#650d0f',
-          300: '#981416',
-          400: '#ca1a1d',
-          500: '#e5383b',
-          600: '#ea6062',
-          700: '#f0888a',
-          800: '#f5b0b1',
-          900: '#fad7d8'
+        slate: '#7591a3',
+        // Text Colors (Dark)
+        'text-dark': {
+          primary: '#ffffff',
+          secondary: '#c3c3c3',
+          muted: '#808080',
         },
-
-        silver: {
-          DEFAULT: '#b1a7a6',
-          100: '#252020',
-          200: '#494040',
-          300: '#6e615f',
-          400: '#918280',
-          500: '#b1a7a6',
-          600: '#c0b8b7',
-          700: '#d0cac9',
-          800: '#e0dbdb',
-          900: '#efeded'
+        // Text Colors (Light)
+        'text-light': {
+          primary: '#1f2d1f',
+          secondary: '#4a5a4f',
+          muted: '#8a9a8f',
         },
-
-        dust_grey: {
-          DEFAULT: '#d3d3d3',
-          100: '#2a2a2a',
-          200: '#555555',
-          300: '#7f7f7f',
-          400: '#a9a9a9',
-          500: '#d3d3d3',
-          600: '#dcdcdc',
-          700: '#e5e5e5',
-          800: '#eeeeee',
-          900: '#f6f6f6'
+        // Semantic Colors (Dark)
+        'semantic-dark': {
+          success: '#4caf50',
+          warning: '#ff9800',
+          error: '#f44336',
+          info: '#2196f3',
         },
-
-        white_smoke: {
-          DEFAULT: '#f5f3f4',
-          100: '#352d31',
-          200: '#6b5962',
-          300: '#9d8993',
-          400: '#c9bfc4',
-          500: '#f5f3f4',
-          600: '#f8f6f7',
-          700: '#f9f8f9',
-          800: '#fbfbfb',
-          900: '#fdfdfd'
+        // Semantic Colors (Light)
+        'semantic-light': {
+          success: '#2d7a3e',
+          warning: '#b8860b',
+          error: '#b44336',
+          info: '#2563a8',
         },
-
-        white: {
-          DEFAULT: '#ffffff',
-          100: '#333333',
-          200: '#666666',
-          300: '#999999',
-          400: '#cccccc',
-          500: '#ffffff',
-          600: '#ffffff',
-          700: '#ffffff',
-          800: '#ffffff',
-          900: '#ffffff'
-        }
-      }
-    }
-    ,
+      },
+      fontFamily: {
+        dongle: ['Dongle', 'sans-serif'],
+        comfortaa: ['Comfortaa', 'sans-serif'],
+        manrope: ['Manrope', 'sans-serif'],
+      },
+      fontSize: {
+        'hero': '56px',
+        'h1': '40px',
+        'h2': '32px',
+        'h3': '24px',
+        'h4': '20px',
+        'body-lg': '18px',
+        'body': '16px',
+        'small': '14px',
+        'caption': '12px',
+      },
+      lineHeight: {
+        'hero': '1.1',
+        'h1': '1.2',
+        'h2': '1.3',
+        'h3': '1.4',
+        'h4': '1.5',
+        'body': '1.6',
+        'small': '1.5',
+        'caption': '1.4',
+      },
+      borderRadius: {
+        'tag': '4px',
+        'button': '8px',
+        'input': '8px',
+        'card': '16px',
+        'elevated': '20px',
+      },
+      boxShadow: {
+        'card-dark': '0 2px 8px rgba(0, 0, 0, 0.3)',
+        'card-hover-dark': '0 4px 16px rgba(0, 0, 0, 0.4)',
+        'dropdown-dark': '0 8px 32px rgba(0, 0, 0, 0.5)',
+        'modal-dark': '0 20px 60px rgba(0, 0, 0, 0.6)',
+        'primary-dark': '0 2px 8px rgba(103, 49, 183, 0.3)',
+        'card-light': '0 2px 8px rgba(0, 0, 0, 0.1)',
+        'card-hover-light': '0 4px 16px rgba(0, 0, 0, 0.12)',
+        'dropdown-light': '0 8px 32px rgba(0, 0, 0, 0.15)',
+        'modal-light': '0 20px 60px rgba(0, 0, 0, 0.2)',
+        'primary-light': '0 2px 8px rgba(90, 122, 95, 0.25)',
+      },
+      transitionTimingFunction: {
+        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.2s ease-out',
+        'slide-in-right': 'slideInRight 0.3s ease-out',
+        'scale-in': 'scaleIn 0.2s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideInRight: {
+          '0%': { transform: 'translateX(100%)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+      },
+    },
   },
   plugins: [],
 }

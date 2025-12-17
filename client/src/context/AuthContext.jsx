@@ -45,6 +45,9 @@ export const AuthProvider = ({ children }) => {
         setUser(user);
         setIsAuthenticated(true);
 
+        // Small delay to ensure state updates before navigation
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         return response.data;
     };
 
