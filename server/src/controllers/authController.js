@@ -1,7 +1,6 @@
 const User = require('../models/userModel');
 const crypto = require('crypto');
 
-// Token storage - replace with Redis later
 const tokenStore = new Map();
 
 // Register new user
@@ -18,7 +17,6 @@ exports.register = async (req, res) => {
             });
         }
 
-        // Create user
         const user = await User.create({
             firstName,
             lastName,
@@ -56,7 +54,6 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validate input
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -73,7 +70,6 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Check if account is active
         if (!user.isActive) {
             return res.status(401).json({
                 success: false,
@@ -81,7 +77,6 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Verify password
         const isPasswordCorrect = await user.comparePassword(password);
         if (!isPasswordCorrect) {
             return res.status(401).json({
@@ -90,11 +85,9 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Update last login
         user.lastLogin = Date.now();
         await user.save();
 
-        // Generate token
         const token = user.generateToken();
 
         // Store session in memory
@@ -169,25 +162,29 @@ exports.forgotPassword = async (req, res) => {
         user.passwordResetExpires = Date.now() + 3600000; // 1 hour
         await user.save();
 
-        // Store in memory
         tokenStore.set(`reset:${hashedToken}`, {
             userId: user._id.toString(),
             expires: Date.now() + 3600000
         });
 
-        // Implement email later
-        console.log('Reset token:', resetToken);
+        // Send email with reset link
+        try {
+            const emailService = require('../services/emailService');
+            await emailService.sendPasswordResetEmail(user.email, resetToken);
+        } catch (emailError) {
+            console.error('Email sending error:', emailError);
+        }
 
         res.status(200).json({
             success: true,
-            message: 'Password reset token generated',
+            message: 'Password reset instructions sent to your email',
             resetToken
         });
     } catch (error) {
         console.error('Forgot password error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to generate reset token'
+            message: 'Failed to process password reset request'
         });
     }
 };
@@ -230,7 +227,6 @@ exports.resetPassword = async (req, res) => {
         user.passwordResetExpires = undefined;
         await user.save();
 
-        // Delete reset token
         tokenStore.delete(`reset:${hashedToken}`);
 
         res.status(200).json({
@@ -260,6 +256,144 @@ exports.getMe = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to get user data'
+        });
+    }
+};
+
+// Update profile
+exports.updateProfile = async (req, res) => {
+    try {
+        const { firstName, lastName, department } = req.body;
+
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Update allowed fields
+        if (firstName !== undefined) user.firstName = firstName;
+        if (lastName !== undefined) user.lastName = lastName;
+        if (department !== undefined) user.department = department;
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            data: { user }
+        });
+    } catch (error) {
+        console.error('Update profile error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update profile'
+        });
+    }
+};
+
+// Change password
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+
+        const user = await User.findById(req.user._id).select('+password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const isPasswordCorrect = await user.comparePassword(currentPassword);
+        if (!isPasswordCorrect) {
+            return res.status(401).json({
+                success: false,
+                message: 'Current password is incorrect'
+            });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        // Send email notification
+        try {
+            const emailService = require('../services/emailService');
+            await emailService.sendPasswordChangeNotification(user.email, user.firstName);
+        } catch (emailError) {
+            console.error('Email notification error:', emailError);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Password changed successfully'
+        });
+    } catch (error) {
+        console.error('Change password error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to change password'
+        });
+    }
+};
+
+// Delete account
+exports.deleteAccount = async (req, res) => {
+    try {
+        const { password } = req.body;
+
+        const user = await User.findById(req.user._id).select('+password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const isPasswordCorrect = await user.comparePassword(password);
+        if (!isPasswordCorrect) {
+            return res.status(401).json({
+                success: false,
+                message: 'Incorrect password. Account deletion cancelled.'
+            });
+        }
+
+        // Soft delete: deactivate account
+        user.isActive = false;
+        await user.save();
+
+        // Handle user's based on role
+        if (user.role === 'lecturer' || user.role === 'admin') {
+            const Course = require('../models/courseModel');
+            const Timetable = require('../models/timetableModel');
+
+            await Course.updateMany(
+                { lecturerId: user._id },
+                { isActive: false }
+            );
+
+            await Timetable.updateMany(
+                { createdBy: user._id, status: { $ne: 'Archived' } },
+                { status: 'Archived' }
+            );
+        }
+
+        tokenStore.delete(user._id.toString());
+
+        res.status(200).json({
+            success: true,
+            message: 'Account deleted successfully. All associated data has been handled.'
+        });
+    } catch (error) {
+        console.error('Delete account error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete account'
         });
     }
 };

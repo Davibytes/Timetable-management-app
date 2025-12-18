@@ -284,3 +284,67 @@ exports.validateUpdateTimetable = (req, res, next) => {
     }
     next();
 };
+
+// Validate update profile
+exports.validateUpdateProfile = (req, res, next) => {
+    const schema = Joi.object({
+        firstName: Joi.string().min(2).max(50).optional().messages({
+            'string.min': 'First name must be at least 2 characters',
+            'string.max': 'First name cannot exceed 50 characters'
+        }),
+        lastName: Joi.string().min(2).max(50).optional().messages({
+            'string.min': 'Last name must be at least 2 characters',
+            'string.max': 'Last name cannot exceed 50 characters'
+        }),
+        department: Joi.string().allow('').optional()
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+        });
+    }
+    next();
+};
+
+// Validate change password
+exports.validateChangePassword = (req, res, next) => {
+    const schema = Joi.object({
+        currentPassword: Joi.string().required().messages({
+            'string.empty': 'Current password is required'
+        }),
+        newPassword: Joi.string().min(6).required().messages({
+            'string.empty': 'New password is required',
+            'string.min': 'New password must be at least 6 characters'
+        })
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+        });
+    }
+    next();
+};
+
+// Validate delete account
+exports.validateDeleteAccount = (req, res, next) => {
+    const schema = Joi.object({
+        password: Joi.string().required().messages({
+            'string.empty': 'Password is required to delete account'
+        })
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+        });
+    }
+    next();
+};

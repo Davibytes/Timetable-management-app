@@ -6,14 +6,20 @@ const {
     logout,
     forgotPassword,
     resetPassword,
-    getMe
+    getMe,
+    updateProfile,
+    changePassword,
+    deleteAccount
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 const {
     validateRegister,
     validateLogin,
     validateForgotPassword,
-    validateResetPassword
+    validateResetPassword,
+    validateUpdateProfile,
+    validateChangePassword,
+    validateDeleteAccount
 } = require('../middleware/validationMiddleware');
 
 // Public routes
@@ -25,5 +31,8 @@ router.post('/reset-password/:token', validateResetPassword, resetPassword);
 // Protected routes
 router.post('/logout', protect, logout);
 router.get('/me', protect, getMe);
+router.put('/profile', protect, validateUpdateProfile, updateProfile);
+router.put('/change-password', protect, validateChangePassword, changePassword);
+router.delete('/account', protect, validateDeleteAccount, deleteAccount);
 
 module.exports = router;
