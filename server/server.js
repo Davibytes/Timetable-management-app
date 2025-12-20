@@ -22,6 +22,10 @@ mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/timetable
 
 // API Routes
 app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use('/api/courses', require('./src/routes/courseRoutes'));
+app.use('/api/rooms', require('./src/routes/roomRoutes'));
+app.use('/api/timetables', require('./src/routes/timetableRoutes'));
+app.use('/api/entries', require('./src/routes/timetableEntryRoutes'));
 
 // Health check
 app.get('/health', (req, res) => {
