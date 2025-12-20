@@ -348,3 +348,76 @@ exports.validateDeleteAccount = (req, res, next) => {
     }
     next();
 };
+
+// Validate timetable entry creation
+exports.validateCreateEntry = (req, res, next) => {
+    const schema = Joi.object({
+        timetableId: Joi.string().length(24).hex().required().messages({
+            'string.empty': 'Timetable ID is required',
+            'string.length': 'Invalid timetable ID format',
+            'string.hex': 'Invalid timetable ID format'
+        }),
+        courseId: Joi.string().length(24).hex().required().messages({
+            'string.empty': 'Course ID is required',
+            'string.length': 'Invalid course ID format',
+            'string.hex': 'Invalid course ID format'
+        }),
+        roomId: Joi.string().length(24).hex().required().messages({
+            'string.empty': 'Room ID is required',
+            'string.length': 'Invalid room ID format',
+            'string.hex': 'Invalid room ID format'
+        }),
+        lecturerId: Joi.string().length(24).hex().required().messages({
+            'string.empty': 'Lecturer ID is required',
+            'string.length': 'Invalid lecturer ID format',
+            'string.hex': 'Invalid lecturer ID format'
+        }),
+        dayOfWeek: Joi.string().valid('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday').required().messages({
+            'string.empty': 'Day of week is required',
+            'any.only': 'Invalid day of week'
+        }),
+        startTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).required().messages({
+            'string.empty': 'Start time is required',
+            'string.pattern.base': 'Start time must be in format HH:MM (e.g., 08:00)'
+        }),
+        endTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).required().messages({
+            'string.empty': 'End time is required',
+            'string.pattern.base': 'End time must be in format HH:MM (e.g., 10:00)'
+        }),
+        type: Joi.string().valid('Lecture', 'Tutorial', 'Lab', 'Seminar', 'Workshop').default('Lecture'),
+        notes: Joi.string().max(300).allow('').optional()
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+        });
+    }
+    next();
+};
+
+// Validate timetable entry update
+exports.validateUpdateEntry = (req, res, next) => {
+    const schema = Joi.object({
+        timetableId: Joi.string().length(24).hex().optional(),
+        courseId: Joi.string().length(24).hex().optional(),
+        roomId: Joi.string().length(24).hex().optional(),
+        lecturerId: Joi.string().length(24).hex().optional(),
+        dayOfWeek: Joi.string().valid('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday').optional(),
+        startTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).optional(),
+        endTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).optional(),
+        type: Joi.string().valid('Lecture', 'Tutorial', 'Lab', 'Seminar', 'Workshop').optional(),
+        notes: Joi.string().max(300).allow('').optional()
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+        });
+    }
+    next();
+};

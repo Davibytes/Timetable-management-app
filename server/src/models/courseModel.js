@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const courseSchema = new mongoose.Schema({
     code: {
         type: String,
-        required: [true, 'Course code is required'],
+        required: false,
         unique: true,
         uppercase: true,
         trim: true
