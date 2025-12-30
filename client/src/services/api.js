@@ -82,4 +82,23 @@ export const timetableAPI = {
     updateMetadata: (id) => api.post(`/timetables/${id}/update-metadata`)
 };
 
+// Timetable Entry API calls
+export const entryAPI = {
+    getAll: (params) => api.get('/entries', { params }),
+    getById: (id) => api.get(`/entries/${id}`),
+    getByDay: (timetableId, dayOfWeek) => api.get(`/entries/timetable/${timetableId}/day`, { params: { dayOfWeek } }),
+    create: (data) => api.post('/entries', data),
+    update: (id, data) => api.put(`/entries/${id}`, data),
+    delete: (id) => api.delete(`/entries/${id}`),
+    checkConflicts: (data) => api.post('/entries/check-conflicts', data)
+};
+
+// Conflict API calls
+export const conflictAPI = {
+    getReport: (timetableId, data) => api.post(`/conflicts/${timetableId}/report`, data),
+    validate: (timetableId, data) => api.post(`/conflicts/${timetableId}/validate`, data),
+    getLecturerWorkload: (lecturerId, params) => api.get(`/conflicts/lecturers/${lecturerId}/workload`, { params }),
+    getSuggestions: (timetableId, data) => api.post(`/conflicts/${timetableId}/suggestions`, data)
+};
+
 export default api;
