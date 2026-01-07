@@ -12,55 +12,64 @@ import DashboardPage from './pages/DashboardPage';
 import CoursesPage from './pages/CoursesPage';
 import RoomsPage from './pages/RoomsPage';
 import TimetableGenerationPage from './pages/TimetableGenerationPage';
+import TimetablesPage from './pages/TimetablesPage';
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <TimetableProvider>
-        <ToastProvider>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <ToastProvider>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/courses"
-              element={
-                <ProtectedRoute>
-                  <CoursesPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/rooms"
-              element={
-                <ProtectedRoute>
-                  <RoomsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/timetables/generate"
-              element={
-                <ProtectedRoute>
-                  <TimetableGenerationPage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/courses"
+                element={
+                  <ProtectedRoute>
+                    <CoursesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/rooms"
+                element={
+                  <ProtectedRoute>
+                    <RoomsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/timetables"
+                element={
+                  <ProtectedRoute>
+                    <TimetablesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/timetables/generate"
+                element={
+                  <ProtectedRoute>
+                    <TimetableGenerationPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </ToastProvider>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </ToastProvider>
         </TimetableProvider>
       </AuthProvider>
     </BrowserRouter>

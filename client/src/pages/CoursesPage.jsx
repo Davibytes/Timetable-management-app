@@ -79,17 +79,6 @@ const CoursesPage = () => {
     return (
         <DashboardLayout title="Courses">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1
-                        className={`text-h2 font-comfortaa font-semibold mb-2 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
-                            }`}
-                    >
-                        Courses
-                    </h1>
-                    <p className={`text-body ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}`}>
-                        {canCreate ? 'Manage your academic courses and schedules' : 'View available courses'}
-                    </p>
-                </div>
                 {canCreate && (
                     <Button
                         variant="primary"

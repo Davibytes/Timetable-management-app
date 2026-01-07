@@ -23,6 +23,10 @@ export const TimetableProvider = ({ children }) => {
         semester: 1,
         academicYear: '',
         selectedCourses: [],
+        selectedCourse: '',
+        room: '',
+        lecturer: '',
+        dayOfWeek: '',
         roomConstraints: {
             minCapacity: 0,
             preferredTypes: [],
@@ -182,6 +186,10 @@ export const TimetableProvider = ({ children }) => {
             semester: 1,
             academicYear: '',
             selectedCourses: [],
+            selectedCourse: '',
+            room: '',
+            lecturer: '',
+            dayOfWeek: '',
             roomConstraints: {
                 minCapacity: 0,
                 preferredTypes: [],

@@ -148,13 +148,6 @@ const DashboardPage = () => {
                 >
                     Full Dashboard Coming Soon
                 </h3>
-                <p
-                    className={`text-small sm:text-body max-w-md mx-auto ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'
-                        }`}
-                >
-                    Timetable management, conflict detection, and scheduling features are under
-                    development.
-                </p>
             </div>
         </DashboardLayout>
     );

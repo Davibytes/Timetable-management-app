@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Plus, Minus, ArrowRight } from 'lucide-react';
+import { Calendar, ArrowRight } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useTimetable } from '../context/TimetableContext';
 import { useToast } from '../components/Toast';
-import { courseAPI } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -15,8 +14,6 @@ const TimetableGenerationPage = () => {
     const toast = useToast();
     const navigate = useNavigate();
 
-    const [courses, setCourses] = useState([]);
-    const [loadingCourses, setLoadingCourses] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         department: '',
@@ -24,11 +21,6 @@ const TimetableGenerationPage = () => {
         academicYear: getCurrentAcademicYear(),
         description: ''
     });
-    const [selectedCourses, setSelectedCourses] = useState([]);
-
-    useEffect(() => {
-        fetchCourses();
-    }, []);
 
     // Get current academic year in format YYYY-YYYY
     function getCurrentAcademicYear() {
@@ -43,19 +35,6 @@ const TimetableGenerationPage = () => {
         }
     }
 
-    const fetchCourses = async () => {
-        setLoadingCourses(true);
-        try {
-            const response = await courseAPI.getAll({ isActive: true });
-            setCourses(response.data.data.courses);
-        } catch (error) {
-            console.error('Failed to fetch courses:', error);
-            toast.error('Failed to load courses');
-        } finally {
-            setLoadingCourses(false);
-        }
-    };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -64,34 +43,17 @@ const TimetableGenerationPage = () => {
         }));
     };
 
-    const handleCourseToggle = (courseId) => {
-        setSelectedCourses(prev =>
-            prev.includes(courseId)
-                ? prev.filter(id => id !== courseId)
-                : [...prev, courseId]
-        );
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.department || !formData.academicYear) {
+        if (!formData.name || !formData.department || !formData.academicYear) {
             toast.error('Please fill in all required fields');
             return;
         }
 
-        if (selectedCourses.length === 0) {
-            toast.error('Please select at least one course');
-            return;
-        }
-
         try {
-            const timetable = await createTimetable({
-                ...formData,
-                courses: selectedCourses
-            });
-
-            toast.success('Timetable created successfully!');
+            const timetable = await createTimetable(formData);
+            toast.success('Timetable created successfully! You can now add sessions.');
             navigate('/timetables');
         } catch (error) {
             console.error('Failed to create timetable:', error);
@@ -99,19 +61,22 @@ const TimetableGenerationPage = () => {
         }
     };
 
-    // Filter courses by selected department and semester
-    const filteredCourses = courses.filter(course => {
-        const matchesDept = !formData.department || course.department === formData.department;
-        const matchesSem = course.semester === formData.semester;
-        return matchesDept && matchesSem;
-    });
-
-    // Get unique departments from courses
-    const departments = [...new Set(courses.map(c => c.department))].sort();
+    // Get unique departments - hardcoded common ones
+    const departments = [
+        'Computer Science',
+        'Software Engineering',
+        'Information Technology',
+        'Mathematics',
+        'Physics',
+        'Chemistry',
+        'Biology',
+        'Engineering',
+        'Business Administration'
+    ];
 
     return (
         <DashboardLayout title="Generate Timetable">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-2xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center gap-3 mb-2">
@@ -125,20 +90,20 @@ const TimetableGenerationPage = () => {
                             className={`text-h2 font-comfortaa font-semibold ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
                                 }`}
                         >
-                            Generate New Timetable
+                            Create New Timetable
                         </h1>
                     </div>
                     <p className={`text-body ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}`}>
-                        Create a new academic timetable by selecting courses and configuring constraints
+                        Create a new timetable framework. You'll be able to add sessions after creation.
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Basic Information */}
                     <div
                         className={`rounded-card p-6 border ${isDark
-                                ? 'bg-dark-surface border-dark-border-subtle'
-                                : 'bg-light-surface border-light-border-subtle'
+                            ? 'bg-dark-surface border-dark-border-subtle'
+                            : 'bg-light-surface border-light-border-subtle'
                             }`}
                     >
                         <h2
@@ -155,7 +120,7 @@ const TimetableGenerationPage = () => {
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                placeholder="e.g., Software Engineering Semester 2"
+                                placeholder="e.g., Software Engineering Semester 2 2024-2025"
                                 required
                             />
 
@@ -172,8 +137,8 @@ const TimetableGenerationPage = () => {
                                         value={formData.department}
                                         onChange={handleChange}
                                         className={`w-full px-4 py-3 rounded-input border transition-smooth ${isDark
-                                                ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary focus-ring-dark'
-                                                : 'bg-light-surface border-light-border-subtle text-text-light-primary focus-ring-light'
+                                            ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary focus-ring-dark'
+                                            : 'bg-light-surface border-light-border-subtle text-text-light-primary focus-ring-light'
                                             }`}
                                         required
                                     >
@@ -198,8 +163,8 @@ const TimetableGenerationPage = () => {
                                         value={formData.semester}
                                         onChange={handleChange}
                                         className={`w-full px-4 py-3 rounded-input border transition-smooth ${isDark
-                                                ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary focus-ring-dark'
-                                                : 'bg-light-surface border-light-border-subtle text-text-light-primary focus-ring-light'
+                                            ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary focus-ring-dark'
+                                            : 'bg-light-surface border-light-border-subtle text-text-light-primary focus-ring-light'
                                             }`}
                                         required
                                     >
@@ -232,94 +197,28 @@ const TimetableGenerationPage = () => {
                                     name="description"
                                     value={formData.description}
                                     onChange={handleChange}
-                                    placeholder="Additional notes about this timetable"
+                                    placeholder="Additional notes about this timetable (optional)"
                                     rows={3}
                                     className={`w-full px-4 py-3 rounded-input border transition-smooth resize-none ${isDark
-                                            ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary placeholder:text-text-dark-muted focus-ring-dark'
-                                            : 'bg-light-surface border-light-border-subtle text-text-light-primary placeholder:text-text-light-muted focus-ring-light'
+                                        ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary placeholder:text-text-dark-muted focus-ring-dark'
+                                        : 'bg-light-surface border-light-border-subtle text-text-light-primary placeholder:text-text-light-muted focus-ring-light'
                                         }`}
                                 />
                             </div>
                         </div>
                     </div>
 
-                    {/* Course Selection */}
+                    {/* Info Box */}
                     <div
-                        className={`rounded-card p-6 border ${isDark
-                                ? 'bg-dark-surface border-dark-border-subtle'
-                                : 'bg-light-surface border-light-border-subtle'
+                        className={`rounded-card p-4 border ${isDark
+                            ? 'bg-[#2196f3]/10 border-[#2196f3]/20'
+                            : 'bg-[#2563a8]/10 border-[#2563a8]/20'
                             }`}
                     >
-                        <h2
-                            className={`text-h4 font-comfortaa font-semibold mb-4 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
-                                }`}
-                        >
-                            Select Courses
-                        </h2>
-
-                        {loadingCourses ? (
-                            <div className="text-center py-8">
-                                <div
-                                    className={`w-8 h-8 border-4 rounded-full animate-spin mx-auto mb-2 ${isDark ? 'border-dark-border-subtle border-t-indigo' : 'border-light-border-subtle border-t-sage'
-                                        }`}
-                                />
-                                <p className={`text-small ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}`}>
-                                    Loading courses...
-                                </p>
-                            </div>
-                        ) : filteredCourses.length === 0 ? (
-                            <div className="text-center py-8">
-                                <p className={`text-body ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}`}>
-                                    {formData.department
-                                        ? `No courses available for ${formData.department} - Semester ${formData.semester}`
-                                        : 'Please select a department to view available courses'}
-                                </p>
-                            </div>
-                        ) : (
-                            <div>
-                                <p className={`text-small mb-4 ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}`}>
-                                    {selectedCourses.length} of {filteredCourses.length} courses selected
-                                </p>
-                                <div className="space-y-2 max-h-96 overflow-y-auto">
-                                    {filteredCourses.map(course => (
-                                        <label
-                                            key={course._id}
-                                            className={`flex items-center gap-3 p-4 rounded-button border cursor-pointer transition-smooth ${selectedCourses.includes(course._id)
-                                                    ? isDark
-                                                        ? 'bg-indigo/15 border-indigo text-indigo-light'
-                                                        : 'bg-sage/10 border-sage text-sage'
-                                                    : isDark
-                                                        ? 'bg-dark-elevated border-dark-border-subtle hover:border-dark-border-prominent'
-                                                        : 'bg-light-elevated border-light-border-subtle hover:border-light-border-prominent'
-                                                }`}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedCourses.includes(course._id)}
-                                                onChange={() => handleCourseToggle(course._id)}
-                                                className="w-4 h-4 rounded accent-current"
-                                            />
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-body font-medium">
-                                                        {course.code}
-                                                    </span>
-                                                    <span className={`text-caption ${isDark ? 'text-text-dark-muted' : 'text-text-light-muted'}`}>
-                                                        •
-                                                    </span>
-                                                    <span className="text-small">
-                                                        {course.name}
-                                                    </span>
-                                                </div>
-                                                <div className={`text-caption ${isDark ? 'text-text-dark-muted' : 'text-text-light-muted'}`}>
-                                                    {course.credits} credits • {course.duration} minutes
-                                                </div>
-                                            </div>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        <p className={`text-small ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}`}>
+                            After creating the timetable, you'll need to manually add sessions by going to the timetable view.
+                            Sessions can be added by selecting courses, rooms, lecturers, and time slots.
+                        </p>
                     </div>
 
                     {/* Actions */}
@@ -334,7 +233,7 @@ const TimetableGenerationPage = () => {
                         <Button
                             variant="primary"
                             type="submit"
-                            disabled={loading || selectedCourses.length === 0}
+                            disabled={loading}
                             icon={<ArrowRight className="w-5 h-5" />}
                             iconPosition="right"
                         >
