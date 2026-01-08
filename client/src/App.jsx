@@ -13,6 +13,7 @@ import CoursesPage from './pages/CoursesPage';
 import RoomsPage from './pages/RoomsPage';
 import TimetableGenerationPage from './pages/TimetableGenerationPage';
 import TimetablesPage from './pages/TimetablesPage';
+// import AdminDashboard from './pages/admin/Dashboard';
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* Removed /admin/dashboard route due to missing AdminDashboard component */}
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
