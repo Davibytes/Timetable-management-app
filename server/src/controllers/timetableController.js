@@ -1,40 +1,3 @@
-// --- VERSIONING ENDPOINTS (STUBS) ---
-// Get all versions of a timetable
-exports.getTimetableVersions = async (req, res) => {
-    // TODO: Implement version history retrieval
-    return res.status(501).json({
-        success: false,
-        message: 'Timetable versioning not implemented yet.'
-    });
-};
-
-// Restore a timetable to a previous version
-exports.restoreTimetableVersion = async (req, res) => {
-    // TODO: Implement version restore
-    return res.status(501).json({
-        success: false,
-        message: 'Timetable version restore not implemented yet.'
-    });
-};
-
-// --- EXPORT ENDPOINTS (STUBS) ---
-// Export timetable as PDF
-exports.exportTimetablePDF = async (req, res) => {
-    // TODO: Implement PDF export
-    return res.status(501).json({
-        success: false,
-        message: 'Timetable PDF export not implemented yet.'
-    });
-};
-
-// Export timetable as Excel
-exports.exportTimetableExcel = async (req, res) => {
-    // TODO: Implement Excel export
-    return res.status(501).json({
-        success: false,
-        message: 'Timetable Excel export not implemented yet.'
-    });
-};
 const Timetable = require('../models/timetableModel');
 const TimetableEntry = require('../models/timetableEntryModel');
 
@@ -158,7 +121,6 @@ exports.updateTimetable = async (req, res) => {
             });
         }
 
-        // Only draft timetables can be modified
         if (!timetable.canModify()) {
             return res.status(400).json({
                 success: false,
@@ -166,7 +128,6 @@ exports.updateTimetable = async (req, res) => {
             });
         }
 
-        // Update fields
         if (name !== undefined) timetable.name = name;
         if (department !== undefined) timetable.department = department;
         if (semester !== undefined) timetable.semester = semester;
@@ -174,7 +135,6 @@ exports.updateTimetable = async (req, res) => {
         if (description !== undefined) timetable.description = description;
 
         await timetable.save();
-
         await timetable.populate('createdBy', 'firstName lastName email');
 
         res.status(200).json({
@@ -210,7 +170,6 @@ exports.deleteTimetable = async (req, res) => {
             });
         }
 
-        // Cannot delete published timetables
         if (timetable.status === 'Published') {
             return res.status(400).json({
                 success: false,
@@ -218,9 +177,7 @@ exports.deleteTimetable = async (req, res) => {
             });
         }
 
-        // Delete all associated entries
         await TimetableEntry.deleteMany({ timetableId: req.params.id });
-
         await timetable.deleteOne();
 
         res.status(200).json({
@@ -248,7 +205,6 @@ exports.publishTimetable = async (req, res) => {
             });
         }
 
-        // Check for conflicts before publishing
         const entries = await TimetableEntry.find({ timetableId: timetable._id });
 
         if (entries.length === 0) {
@@ -398,4 +354,34 @@ exports.updateTimetableMetadata = async (req, res) => {
             message: 'Failed to update timetable metadata'
         });
     }
+};
+
+// --- VERSIONING ENDPOINTS (STUBS FOR FUTURE) ---
+exports.getTimetableVersions = async (req, res) => {
+    return res.status(501).json({
+        success: false,
+        message: 'Timetable versioning not implemented yet. This feature will be added in a future release.'
+    });
+};
+
+exports.restoreTimetableVersion = async (req, res) => {
+    return res.status(501).json({
+        success: false,
+        message: 'Timetable version restore not implemented yet. This feature will be added in a future release.'
+    });
+};
+
+// --- EXPORT ENDPOINTS (STUBS FOR FUTURE) ---
+exports.exportTimetablePDF = async (req, res) => {
+    return res.status(501).json({
+        success: false,
+        message: 'PDF export not implemented yet. This feature will be added in a future release.'
+    });
+};
+
+exports.exportTimetableExcel = async (req, res) => {
+    return res.status(501).json({
+        success: false,
+        message: 'Excel export not implemented yet. This feature will be added in a future release.'
+    });
 };

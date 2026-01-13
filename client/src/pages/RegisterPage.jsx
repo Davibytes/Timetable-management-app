@@ -8,6 +8,7 @@ import ChronosLogo from '../components/ChronosLogo';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import ThemeToggle from '../components/ThemeToggle';
+import Dropdown from '../components/Dropdown';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -96,8 +97,8 @@ const RegisterPage = () => {
                     <Link
                         to="/"
                         className={`flex items-center gap-2 text-small transition-smooth ${isDark
-                                ? 'text-text-dark-secondary hover:text-text-dark-primary'
-                                : 'text-text-light-secondary hover:text-text-light-primary'
+                            ? 'text-text-dark-secondary hover:text-text-dark-primary'
+                            : 'text-text-light-secondary hover:text-text-light-primary'
                             }`}
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -172,28 +173,18 @@ const RegisterPage = () => {
                             />
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label
-                                        className={`block text-small font-medium mb-2 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
-                                            }`}
-                                    >
-                                        Role <span className={isDark ? 'text-semantic-dark-error' : 'text-semantic-light-error'}>*</span>
-                                    </label>
-                                    <select
-                                        name="role"
-                                        value={formData.role}
-                                        onChange={handleChange}
-                                        className={`w-full px-4 py-3 rounded-input border transition-smooth ${isDark
-                                                ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary focus-ring-dark'
-                                                : 'bg-light-surface border-light-border-subtle text-text-light-primary focus-ring-light'
-                                            }`}
-                                        required
-                                    >
-                                        <option value="student">Student</option>
-                                        <option value="lecturer">Lecturer</option>
-                                        <option value="admin">Admin</option>
-                                    </select>
-                                </div>
+                                <Dropdown
+                                    label="Role"
+                                    name="role"
+                                    value={formData.role}
+                                    onChange={handleChange}
+                                    options={[
+                                        { value: 'student', label: 'Student' },
+                                        { value: 'lecturer', label: 'Lecturer' },
+                                        { value: 'admin', label: 'Admin' }
+                                    ]}
+                                    required
+                                />
 
                                 <Input
                                     label="Department"
@@ -219,8 +210,8 @@ const RegisterPage = () => {
                             <Link
                                 to="/login"
                                 className={`font-medium transition-smooth ${isDark
-                                        ? 'text-indigo-light hover:text-indigo'
-                                        : 'text-sage hover:text-sage-dark'
+                                    ? 'text-indigo-light hover:text-indigo'
+                                    : 'text-sage hover:text-sage-dark'
                                     }`}
                             >
                                 Sign In

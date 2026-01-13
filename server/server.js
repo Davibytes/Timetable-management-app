@@ -27,7 +27,6 @@ app.use('/api/rooms', require('./src/routes/roomRoutes'));
 app.use('/api/timetables', require('./src/routes/timetableRoutes'));
 app.use('/api/entries', require('./src/routes/timetableEntryRoutes'));
 app.use('/api/conflicts', require('./src/routes/conflictRoutes'));
-app.use('/api/admin', require('./src/routes/adminRoutes'));
 
 // Health check
 app.get('/health', (req, res) => {

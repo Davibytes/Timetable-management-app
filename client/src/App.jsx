@@ -12,8 +12,8 @@ import DashboardPage from './pages/DashboardPage';
 import CoursesPage from './pages/CoursesPage';
 import RoomsPage from './pages/RoomsPage';
 import TimetableGenerationPage from './pages/TimetableGenerationPage';
-import TimetablesPage from './pages/TimetablesPage';
-// import AdminDashboard from './pages/admin/Dashboard';
+import TimetableListPage from './pages/TimetableListPage';
+import TimetableViewPage from './pages/TimetableViewPage';
 
 function App() {
   return (
@@ -22,11 +22,13 @@ function App() {
         <TimetableProvider>
           <ToastProvider>
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
+              {/* Protected Routes */}
               <Route
                 path="/dashboard"
                 element={
@@ -55,7 +57,7 @@ function App() {
                 path="/timetables"
                 element={
                   <ProtectedRoute>
-                    <TimetablesPage />
+                    <TimetableListPage />
                   </ProtectedRoute>
                 }
               />
@@ -67,8 +69,16 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              {/* Removed /admin/dashboard route due to missing AdminDashboard component */}
+              <Route
+                path="/timetables/view/:id"
+                element={
+                  <ProtectedRoute>
+                    <TimetableViewPage />
+                  </ProtectedRoute>
+                }
+              />
 
+              {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </ToastProvider>

@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Send, Archive, Trash2, Filter } from 'lucide-react';
+import { Eye, Send, Archive, Trash2, Plus, Filter, X } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useTimetable } from '../context/TimetableContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Toast';
 import DashboardLayout from '../components/DashboardLayout';
 import Button from '../components/Button';
+import Dropdown from '../components/Dropdown';
 import { canManageContent } from '../utils/rbac';
 
 const TimetableListPage = () => {
@@ -29,6 +30,7 @@ const TimetableListPage = () => {
     const canCreate = canManageContent(user);
 
     const [filters, setFilters] = useState({ department: '', semester: '', status: '' });
+    const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
         loadTimetables();
@@ -78,7 +80,7 @@ const TimetableListPage = () => {
             toast.success('Timetable deleted');
             await loadTimetables(filters);
         } catch (err) {
-            toast.error('Failed to delete timetable');
+            toast.error(err.response?.data?.message || 'Failed to delete timetable');
         }
     };
 
@@ -89,7 +91,7 @@ const TimetableListPage = () => {
             toast.success('Timetable published');
             await loadTimetables(filters);
         } catch (err) {
-            toast.error('Failed to publish timetable');
+            toast.error(err.response?.data?.message || 'Failed to publish timetable');
         }
     };
 
@@ -100,7 +102,7 @@ const TimetableListPage = () => {
             toast.success('Timetable unpublished');
             await loadTimetables(filters);
         } catch (err) {
-            toast.error('Failed to unpublish timetable');
+            toast.error(err.response?.data?.message || 'Failed to unpublish timetable');
         }
     };
 
@@ -111,110 +113,248 @@ const TimetableListPage = () => {
                 : 'bg-[#b8860b]/15 text-[#b8860b]',
             Published: isDark
                 ? 'bg-[#4caf50]/15 text-[#4caf50]'
-                : 'bg-[#2d7a3e]/15 text-[#2d7a3e]'
+                : 'bg-[#2d7a3e]/15 text-[#2d7a3e]',
+            Archived: isDark
+                ? 'bg-[#808080]/15 text-[#808080]'
+                : 'bg-[#8a9a8f]/15 text-[#8a9a8f]'
         };
-        return badges[status] || (isDark ? 'bg-[#808080]/15 text-[#808080]' : 'bg-[#8a9a8f]/15 text-[#8a9a8f]');
+        return badges[status] || badges.Draft;
     };
+
+    const hasActiveFilters = filters.department || filters.semester || filters.status;
 
     return (
         <DashboardLayout title="Timetables">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            {/* Action Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
-                    <div className={`rounded-lg p-3 border ${isDark ? 'bg-dark-surface border-dark-border-subtle' : 'bg-light-surface border-light-border-subtle'}`}>
-                        <Filter className={isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'} />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <select
-                            value={filters.department}
-                            onChange={e => setFilters(f => ({ ...f, department: e.target.value }))}
-                            className={`px-3 py-2 rounded-lg border ${isDark ? 'bg-[#1a1a1a] border-[#2a2a2a] text-white' : 'bg-white border-[#e8ebe6] text-[#1f2d1f]'}`}
-                        >
-                            <option value="">All departments</option>
-                            {departments.map(d => (
-                                <option key={d} value={d}>{d}</option>
-                            ))}
-                        </select>
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-button transition-smooth ${showFilters || hasActiveFilters
+                                ? isDark
+                                    ? 'bg-indigo/15 text-indigo-light'
+                                    : 'bg-sage/10 text-sage'
+                                : isDark
+                                    ? 'text-text-dark-secondary hover:bg-white/5'
+                                    : 'text-text-light-secondary hover:bg-black/5'
+                            }`}
+                    >
+                        <Filter className="w-4 h-4" />
+                        <span className="text-small">Filters</span>
+                        {hasActiveFilters && (
+                            <span
+                                className={`w-2 h-2 rounded-full ${isDark ? 'bg-indigo-light' : 'bg-sage'
+                                    }`}
+                            />
+                        )}
+                    </button>
 
-                        <select
-                            value={filters.semester}
-                            onChange={e => setFilters(f => ({ ...f, semester: e.target.value }))}
-                            className={`px-3 py-2 rounded-lg border ${isDark ? 'bg-[#1a1a1a] border-[#2a2a2a] text-white' : 'bg-white border-[#e8ebe6] text-[#1f2d1f]'}`}
-                        >
-                            <option value="">All semesters</option>
-                            {[1,2,3,4,5,6,7,8].map(s => (
-                                <option key={s} value={s}>Semester {s}</option>
-                            ))}
-                        </select>
-
-                        <select
-                            value={filters.status}
-                            onChange={e => setFilters(f => ({ ...f, status: e.target.value }))}
-                            className={`px-3 py-2 rounded-lg border ${isDark ? 'bg-[#1a1a1a] border-[#2a2a2a] text-white' : 'bg-white border-[#e8ebe6] text-[#1f2d1f]'}`}
-                        >
-                            <option value="">All statuses</option>
-                            <option value="Draft">Draft</option>
-                            <option value="Published">Published</option>
-                            <option value="Archived">Archived</option>
-                        </select>
-
-                        <Button variant="secondary" onClick={handleApplyFilters}>Apply</Button>
-                        <Button variant="secondary" onClick={handleReset}>Reset</Button>
-                    </div>
+                    <span className={`text-small ${isDark ? 'text-text-dark-muted' : 'text-text-light-muted'}`}>
+                        {timetables.length} total
+                    </span>
                 </div>
 
                 {canCreate && (
-                    <div>
-                        <Button variant="primary" onClick={() => navigate('/timetables/generate')}>Generate Timetable</Button>
-                    </div>
+                    <Button
+                        variant="primary"
+                        icon={<Plus className="w-5 h-5" />}
+                        onClick={() => navigate('/timetables/generate')}
+                    >
+                        Generate Timetable
+                    </Button>
                 )}
             </div>
 
+            {/* Collapsible Filters */}
+            {showFilters && (
+                <div
+                    className={`rounded-card p-4 border mb-6 ${isDark
+                            ? 'bg-dark-surface border-dark-border-subtle'
+                            : 'bg-light-surface border-light-border-subtle'
+                        }`}
+                >
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <Dropdown
+                            value={filters.department}
+                            onChange={e => setFilters(f => ({ ...f, department: e.target.value }))}
+                            options={[
+                                { value: '', label: 'All departments' },
+                                ...departments.map(d => ({ value: d, label: d }))
+                            ]}
+                        />
+
+                        <Dropdown
+                            value={filters.semester}
+                            onChange={e => setFilters(f => ({ ...f, semester: e.target.value }))}
+                            options={[
+                                { value: '', label: 'All semesters' },
+                                { value: '1', label: 'Semester 1' },
+                                { value: '2', label: 'Semester 2' },
+                                { value: '3', label: 'Semester 3' },
+                                { value: '4', label: 'Semester 4' }
+                            ]}
+                        />
+
+                        <Dropdown
+                            value={filters.status}
+                            onChange={e => setFilters(f => ({ ...f, status: e.target.value }))}
+                            options={[
+                                { value: '', label: 'All statuses' },
+                                { value: 'Draft', label: 'Draft' },
+                                { value: 'Published', label: 'Published' },
+                                { value: 'Archived', label: 'Archived' }
+                            ]}
+                        />
+
+                        <div className="flex items-end gap-2">
+                            <Button variant="secondary" onClick={handleApplyFilters} fullWidth size="small">
+                                Apply
+                            </Button>
+                            {hasActiveFilters && (
+                                <button
+                                    onClick={handleReset}
+                                    className={`p-2 rounded-button transition-smooth ${isDark
+                                            ? 'text-text-dark-muted hover:text-text-dark-primary hover:bg-white/5'
+                                            : 'text-text-light-muted hover:text-text-light-primary hover:bg-black/5'
+                                        }`}
+                                    aria-label="Reset filters"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Content */}
             {loading ? (
                 <div className="text-center py-16">
-                    <div className={`w-12 h-12 border-4 rounded-full animate-spin mx-auto mb-4 ${isDark ? 'border-dark-border-subtle border-t-indigo' : 'border-light-border-subtle border-t-sage'}`} />
-                    <p className={isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}>Loading timetables...</p>
+                    <div
+                        className={`w-12 h-12 border-4 rounded-full animate-spin mx-auto mb-4 ${isDark ? 'border-dark-border-subtle border-t-indigo' : 'border-light-border-subtle border-t-sage'
+                            }`}
+                    />
+                    <p className={`text-body ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}`}>
+                        Loading...
+                    </p>
                 </div>
             ) : timetables.length === 0 ? (
-                <div className={`rounded-card p-12 text-center border ${isDark ? 'bg-dark-surface border-dark-border-subtle' : 'bg-light-surface border-light-border-subtle'}`}>
-                    <h3 className={isDark ? 'text-text-dark-primary' : 'text-text-light-primary'}>No timetables found</h3>
+                <div
+                    className={`rounded-card p-12 text-center border ${isDark
+                            ? 'bg-dark-surface border-dark-border-subtle'
+                            : 'bg-light-surface border-light-border-subtle'
+                        }`}
+                >
+                    <h3
+                        className={`text-h3 font-comfortaa font-semibold mb-2 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
+                            }`}
+                    >
+                        No timetables
+                    </h3>
+                    {canCreate && (
+                        <Button
+                            variant="primary"
+                            icon={<Plus className="w-5 h-5" />}
+                            onClick={() => navigate('/timetables/generate')}
+                            className="mt-4"
+                        >
+                            Generate Timetable
+                        </Button>
+                    )}
                 </div>
             ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {timetables.map(t => (
-                        <div key={t._id} className={`rounded-card p-6 border ${isDark ? 'bg-dark-surface border-dark-border-subtle' : 'bg-light-surface border-light-border-subtle'}`}>
+                        <div
+                            key={t._id}
+                            className={`rounded-card p-6 border transition-smooth-300 ${isDark
+                                    ? 'bg-dark-surface border-dark-border-subtle shadow-card-dark card-hover-dark'
+                                    : 'bg-light-surface border-light-border-subtle shadow-card-light card-hover-light'
+                                }`}
+                        >
                             <div className="flex items-start justify-between mb-4">
-                                <div className="flex-1">
-                                    <h3 className={isDark ? 'text-text-dark-primary' : 'text-text-light-primary'}>{t.name}</h3>
-                                    <span className={`px-3 py-1 rounded-tag text-caption font-medium ${getStatusBadge(t.status)}`}>{t.status}</span>
+                                <div className="flex-1 min-w-0">
+                                    <h3
+                                        className={`text-h4 font-comfortaa font-semibold mb-2 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
+                                            }`}
+                                    >
+                                        {t.name}
+                                    </h3>
+                                    <span className={`px-3 py-1 rounded-tag text-caption font-medium ${getStatusBadge(t.status)}`}>
+                                        {t.status}
+                                    </span>
                                 </div>
                             </div>
 
-                            <div className="space-y-2 mb-4 text-small">
-                                <div><strong className={isDark ? 'text-text-dark-muted' : 'text-text-light-muted'}>Department:</strong> <span className={isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}>{t.department}</span></div>
-                                <div><strong className={isDark ? 'text-text-dark-muted' : 'text-text-light-muted'}>Semester:</strong> <span className={isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}>Semester {t.semester}</span></div>
+                            <div className="space-y-2 mb-4">
+                                <div className="flex items-center gap-2 text-small">
+                                    <span className={isDark ? 'text-text-dark-muted' : 'text-text-light-muted'}>
+                                        {t.department}
+                                    </span>
+                                    <span className={isDark ? 'text-text-dark-muted' : 'text-text-light-muted'}>•</span>
+                                    <span className={isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}>
+                                        Semester {t.semester}
+                                    </span>
+                                </div>
+                                <div className="text-small">
+                                    <span className={isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'}>
+                                        {t.academicYear}
+                                    </span>
+                                </div>
                             </div>
 
-                            <div className={`flex items-center gap-2 pt-4 border-t ${isDark ? 'border-dark-border-subtle' : 'border-light-border-subtle'}`}>
-                                <button onClick={() => handleView(t._id)} aria-label="View timetable" className={`p-2 rounded-button ${isDark ? 'text-text-dark-secondary hover:text-text-dark-primary hover:bg-white/10' : 'text-text-light-secondary hover:text-text-light-primary hover:bg-black/5'}`}>
+                            <div
+                                className={`flex items-center gap-2 pt-4 border-t ${isDark ? 'border-dark-border-subtle' : 'border-light-border-subtle'
+                                    }`}
+                            >
+                                <button
+                                    onClick={() => handleView(t._id)}
+                                    className={`p-2 rounded-button transition-smooth ${isDark
+                                            ? 'text-text-dark-secondary hover:text-text-dark-primary hover:bg-white/10'
+                                            : 'text-text-light-secondary hover:text-text-light-primary hover:bg-black/5'
+                                        }`}
+                                    aria-label="View timetable"
+                                >
                                     <Eye className="w-4 h-4" />
                                 </button>
 
                                 {canCreate && (
                                     <>
                                         {t.status === 'Draft' && (
-                                            <button onClick={() => handlePublish(t._id, t.name)} aria-label="Publish timetable" className={`p-2 rounded-button ${isDark ? 'text-text-dark-secondary hover:text-[#4caf50] hover:bg-[#4caf50]/10' : 'text-text-light-secondary hover:text-[#2d7a3e] hover:bg-[#2d7a3e]/10'}`}>
+                                            <button
+                                                onClick={() => handlePublish(t._id, t.name)}
+                                                className={`p-2 rounded-button transition-smooth ${isDark
+                                                        ? 'text-text-dark-secondary hover:text-[#4caf50] hover:bg-[#4caf50]/10'
+                                                        : 'text-text-light-secondary hover:text-[#2d7a3e] hover:bg-[#2d7a3e]/10'
+                                                    }`}
+                                                aria-label="Publish timetable"
+                                            >
                                                 <Send className="w-4 h-4" />
                                             </button>
                                         )}
 
                                         {t.status === 'Published' && (
-                                            <button onClick={() => handleUnpublish(t._id, t.name)} aria-label="Unpublish timetable" className={`p-2 rounded-button ${isDark ? 'text-text-dark-secondary hover:text-[#ff9800] hover:bg-[#ff9800]/10' : 'text-text-light-secondary hover:text-[#b8860b] hover:bg-[#b8860b]/10'}`}>
+                                            <button
+                                                onClick={() => handleUnpublish(t._id, t.name)}
+                                                className={`p-2 rounded-button transition-smooth ${isDark
+                                                        ? 'text-text-dark-secondary hover:text-[#ff9800] hover:bg-[#ff9800]/10'
+                                                        : 'text-text-light-secondary hover:text-[#b8860b] hover:bg-[#b8860b]/10'
+                                                    }`}
+                                                aria-label="Unpublish timetable"
+                                            >
                                                 <Archive className="w-4 h-4" />
                                             </button>
                                         )}
 
                                         {t.status !== 'Published' && (
-                                            <button onClick={() => handleDelete(t._id, t.name)} aria-label="Delete timetable" className={`p-2 rounded-button ${isDark ? 'text-text-dark-secondary hover:text-semantic-dark-error hover:bg-semantic-dark-error/10' : 'text-text-light-secondary hover:text-semantic-light-error hover:bg-semantic-light-error/10'}`}>
+                                            <button
+                                                onClick={() => handleDelete(t._id, t.name)}
+                                                className={`p-2 rounded-button transition-smooth ${isDark
+                                                        ? 'text-text-dark-secondary hover:text-semantic-dark-error hover:bg-semantic-dark-error/10'
+                                                        : 'text-text-light-secondary hover:text-semantic-light-error hover:bg-semantic-light-error/10'
+                                                    }`}
+                                                aria-label="Delete timetable"
+                                            >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         )}

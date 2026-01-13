@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { courseAPI, authAPI } from '../services/api';
 import Button from './Button';
 import Input from './Input';
+import Dropdown from './Dropdown';
 
 const CourseForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
     const { isDark } = useTheme();
@@ -100,8 +101,8 @@ const CourseForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
 
             <div
                 className={`relative w-full max-w-2xl mx-4 rounded-elevated p-8 animate-scale-in ${isDark
-                        ? 'bg-dark-surface border border-dark-border-prominent shadow-modal-dark'
-                        : 'bg-light-surface border border-light-border-subtle shadow-modal-light'
+                    ? 'bg-dark-surface border border-dark-border-prominent shadow-modal-dark'
+                    : 'bg-light-surface border border-light-border-subtle shadow-modal-light'
                     }`}
             >
                 <div className="flex items-center justify-between mb-6 pb-4 border-b border-current opacity-20">
@@ -114,8 +115,8 @@ const CourseForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
                     <button
                         onClick={onClose}
                         className={`p-2 rounded-button transition-smooth ${isDark
-                                ? 'text-text-dark-muted hover:text-text-dark-primary hover:bg-white/10'
-                                : 'text-text-light-muted hover:text-text-light-primary hover:bg-black/5'
+                            ? 'text-text-dark-muted hover:text-text-dark-primary hover:bg-white/10'
+                            : 'text-text-light-muted hover:text-text-light-primary hover:bg-black/5'
                             }`}
                         aria-label="Close modal"
                     >
@@ -145,29 +146,19 @@ const CourseForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
                             required
                         />
 
-                        <div>
-                            <label
-                                className={`block text-small font-medium mb-2 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
-                                    }`}
-                            >
-                                Semester <span className={isDark ? 'text-semantic-dark-error' : 'text-semantic-light-error'}>*</span>
-                            </label>
-                            <select
-                                name="semester"
-                                value={formData.semester}
-                                onChange={handleChange}
-                                className={`w-full px-4 py-3 rounded-input border transition-smooth ${isDark
-                                        ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary focus-ring-dark'
-                                        : 'bg-light-surface border-light-border-subtle text-text-light-primary focus-ring-light'
-                                    }`}
-                                required
-                            >
-                                <option value={1}>Semester 1</option>
-                                <option value={2}>Semester 2</option>
-                                <option value={3}>Semester 3</option>
-                                <option value={4}>Semester 4</option>
-                            </select>
-                        </div>
+                        <Dropdown
+                            label="Semester"
+                            name="semester"
+                            value={formData.semester}
+                            onChange={handleChange}
+                            options={[
+                                { value: 1, label: 'Semester 1' },
+                                { value: 2, label: 'Semester 2' },
+                                { value: 3, label: 'Semester 3' },
+                                { value: 4, label: 'Semester 4' }
+                            ]}
+                            required
+                        />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -195,31 +186,20 @@ const CourseForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
                         />
                     </div>
 
-                    <div>
-                        <label
-                            className={`block text-small font-medium mb-2 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
-                                }`}
-                        >
-                            Lecturer <span className={isDark ? 'text-semantic-dark-error' : 'text-semantic-light-error'}>*</span>
-                        </label>
-                        <select
-                            name="lecturerId"
-                            value={formData.lecturerId}
-                            onChange={handleChange}
-                            className={`w-full px-4 py-3 rounded-input border transition-smooth ${isDark
-                                    ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary focus-ring-dark'
-                                    : 'bg-light-surface border-light-border-subtle text-text-light-primary focus-ring-light'
-                                }`}
-                            required
-                        >
-                            <option value="">Select lecturer</option>
-                            {lecturers.map(lecturer => (
-                                <option key={lecturer._id} value={lecturer._id}>
-                                    {lecturer.firstName} {lecturer.lastName}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <Dropdown
+                        label="Lecturer"
+                        name="lecturerId"
+                        value={formData.lecturerId}
+                        onChange={handleChange}
+                        options={[
+                            { value: '', label: 'Select lecturer' },
+                            ...lecturers.map(l => ({
+                                value: l._id,
+                                label: `${l.firstName} ${l.lastName}`
+                            }))
+                        ]}
+                        required
+                    />
 
                     <div>
                         <label
@@ -236,8 +216,8 @@ const CourseForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
                             rows={3}
                             maxLength={500}
                             className={`w-full px-4 py-3 rounded-input border transition-smooth resize-none ${isDark
-                                    ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary placeholder:text-text-dark-muted focus-ring-dark'
-                                    : 'bg-light-surface border-light-border-subtle text-text-light-primary placeholder:text-text-light-muted focus-ring-light'
+                                ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary placeholder:text-text-dark-muted focus-ring-dark'
+                                : 'bg-light-surface border-light-border-subtle text-text-light-primary placeholder:text-text-light-muted focus-ring-light'
                                 }`}
                         />
                     </div>

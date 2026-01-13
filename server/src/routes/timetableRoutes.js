@@ -10,7 +10,11 @@ const {
     unpublishTimetable,
     archiveTimetable,
     getTimetableEntries,
-    updateTimetableMetadata
+    updateTimetableMetadata,
+    getTimetableVersions,
+    restoreTimetableVersion,
+    exportTimetablePDF,
+    exportTimetableExcel
 } = require('../controllers/timetableController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 const {
@@ -21,6 +25,14 @@ const {
 router.get('/', protect, getAllTimetables);
 router.get('/:id', protect, getTimetableById);
 router.get('/:id/entries', protect, getTimetableEntries);
+
+// Versioning endpoints (stubs)
+router.get('/:id/versions', protect, restrictTo('admin', 'lecturer'), getTimetableVersions);
+router.post('/:id/restore/:version', protect, restrictTo('admin', 'lecturer'), restoreTimetableVersion);
+
+// Export endpoints (stubs)
+router.get('/:id/export/pdf', protect, exportTimetablePDF);
+router.get('/:id/export/excel', protect, exportTimetableExcel);
 
 // Admin and lecturer only
 router.post(

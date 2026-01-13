@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Users, CheckCircle, ArrowRight, Workflow, Zap, Shield, TrendingUp } from 'lucide-react';
+import { Calendar, Clock, Users, CheckCircle, ArrowRight, Zap, Shield, TrendingUp } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import ChronosLogo from '../components/ChronosLogo';
 import ThemeToggle from '../components/ThemeToggle';
@@ -49,7 +49,7 @@ const LandingPage = () => {
                             className={`text-body lg:text-body-lg mb-8 leading-relaxed ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'
                                 }`}
                         >
-                            Create your entire semester schedule in minutes, not days. Chronos automatically checks for conflicts, suggests optimal time slots, and keeps everyone on the same page.
+                            Create your entire semester schedule in minutes. Chronos automatically checks for conflicts, suggests optimal time slots, and keeps everyone on the same page.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Link to="/register">
@@ -75,7 +75,7 @@ const LandingPage = () => {
                         {/* Mock Timetable Header */}
                         <div className={`px-6 py-4 border-b ${isDark ? 'bg-dark-elevated border-dark-border-subtle' : 'bg-light-elevated border-light-border-subtle'}`}>
                             <h3 className={`text-body font-comfortaa font-semibold ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'}`}>
-                                2nd Semester 2026 - Software Enginneering
+                                Software Engineering - Semester 2
                             </h3>
                             <p className={`text-caption mt-1 ${isDark ? 'text-text-dark-muted' : 'text-text-light-muted'}`}>
                                 6 courses • No conflicts
@@ -107,7 +107,7 @@ const LandingPage = () => {
                                         <div className="opacity-90 text-[10px]">Amphi 101</div>
                                     </div>
                                     <div className={`${isDark ? 'bg-dark-elevated border border-dark-border-prominent' : 'bg-light-elevated border border-light-border-prominent'} rounded`}></div>
-                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate-blue'} text-white rounded p-2 text-caption`}>
+                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate'} text-white rounded p-2 text-caption`}>
                                         <div className="font-comfortaa font-semibold text-xs mb-0.5">CS Ethics</div>
                                         <div className="opacity-90 text-[10px]">Amphi 101</div>
                                     </div>
@@ -141,7 +141,7 @@ const LandingPage = () => {
                                     <div className={`text-caption text-center py-3 rounded ${isDark ? 'bg-dark-canvas text-text-dark-muted' : 'bg-light-canvas text-text-light-muted'}`}>
                                         12:00
                                     </div>
-                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate-blue'} text-white rounded p-2 text-caption`}>
+                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate'} text-white rounded p-2 text-caption`}>
                                         <div className="font-comfortaa font-semibold text-xs mb-0.5">I. Prog</div>
                                         <div className="opacity-90 text-[10px]">Room 1</div>
                                     </div>
@@ -150,7 +150,7 @@ const LandingPage = () => {
                                         <div className="font-comfortaa font-semibold text-xs mb-0.5">SW Design</div>
                                         <div className="opacity-90 text-[10px]">Room 3</div>
                                     </div>
-                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate-blue'} text-white rounded p-2 text-caption`}>
+                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate'} text-white rounded p-2 text-caption`}>
                                         <div className="font-comfortaa font-semibold text-xs mb-0.5">Research</div>
                                         <div className="opacity-90 text-[10px]">Amphi 201</div>
                                     </div>
@@ -163,7 +163,7 @@ const LandingPage = () => {
                                         14:00
                                     </div>
                                     <div className={`${isDark ? 'bg-dark-elevated border border-dark-border-prominent' : 'bg-light-elevated border border-light-border-prominent'} rounded`}></div>
-                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate-blue'} text-white rounded p-2 text-caption`}>
+                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate'} text-white rounded p-2 text-caption`}>
                                         <div className="font-comfortaa font-semibold text-xs mb-0.5">B. French</div>
                                         <div className="opacity-90 text-[10px]">Lab 2</div>
                                     </div>
@@ -172,8 +172,8 @@ const LandingPage = () => {
                                         <div className="font-comfortaa font-semibold text-xs mb-0.5">Adv CS</div>
                                         <div className="opacity-90 text-[10px]">Room 7</div>
                                     </div>
-                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate-blue'} text-white rounded p-2 text-caption`}>
-                                        <div className="font-comfortaa font-semibold text-xs mb-0.5">Prog Lang C.</div>
+                                    <div className={`${isDark ? 'bg-indigo-velvet' : 'bg-slate'} text-white rounded p-2 text-caption`}>
+                                        <div className="font-comfortaa font-semibold text-xs mb-0.5">Prog Lang</div>
                                         <div className="opacity-90 text-[10px]">Room 5</div>
                                     </div>
                                 </div>
@@ -197,19 +197,19 @@ const LandingPage = () => {
                         isDark={isDark}
                         icon={<Zap className="w-8 h-8" />}
                         title="Fast"
-                        description="Generate complete timetables in under 1 minute with our optimized algorithms"
+                        description="Generate complete timetables in under 1 minute"
                     />
                     <WhyCard
                         isDark={isDark}
                         icon={<Shield className="w-8 h-8" />}
                         title="Conflict-Free"
-                        description="Intelligent detection prevents double-bookings and scheduling errors"
+                        description="Intelligent detection prevents double-bookings"
                     />
                     <WhyCard
                         isDark={isDark}
                         icon={<TrendingUp className="w-8 h-8" />}
                         title="AI-Powered"
-                        description="Smart optimization learns from patterns to improve scheduling efficiency"
+                        description="Smart optimization for efficient scheduling"
                     />
                 </div>
             </section>
@@ -220,7 +220,7 @@ const LandingPage = () => {
                     className={`text-h2 font-comfortaa font-semibold text-center mb-12 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
                         }`}
                 >
-                    Everything you need to manage schedules
+                    Everything you need
                 </h2>
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -228,19 +228,19 @@ const LandingPage = () => {
                         isDark={isDark}
                         icon={<Calendar className="w-8 h-8" />}
                         title="Automated Generation"
-                        description="Create complete timetables in seconds with intelligent scheduling"
+                        description="Create complete timetables in seconds"
                     />
                     <FeatureCard
                         isDark={isDark}
                         icon={<Clock className="w-8 h-8" />}
                         title="Conflict Detection"
-                        description="Real-time detection of scheduling conflicts and capacity issues"
+                        description="Real-time detection of scheduling conflicts"
                     />
                     <FeatureCard
                         isDark={isDark}
                         icon={<Users className="w-8 h-8" />}
                         title="Role Management"
-                        description="Multi-role access control for admins, lecturers, and students"
+                        description="Access control for admins, lecturers, students"
                     />
                     <FeatureCard
                         isDark={isDark}
@@ -251,7 +251,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-
             {/* Footer */}
             <footer
                 className={`border-t mt-24 ${isDark ? 'border-dark-border-subtle' : 'border-light-border-subtle'
@@ -259,7 +258,7 @@ const LandingPage = () => {
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-center">
                     <p className={`text-small ${isDark ? 'text-text-dark-muted' : 'text-text-light-muted'}`}>
-                        © 2025 Chronos. Automated Timetable Management System.
+                        © 2025 Chronos. Automated Timetable Management.
                     </p>
                 </div>
             </footer>
@@ -267,70 +266,6 @@ const LandingPage = () => {
     );
 };
 
-// Workflow Card Component
-const WorkflowCard = ({ isDark, icon, title, description, time }) => (
-    <div
-        className={`rounded-button p-4 border transition-smooth ${isDark
-            ? 'bg-dark-elevated border-dark-border-subtle hover:border-indigo'
-            : 'bg-light-elevated border-light-border-subtle hover:border-sage'
-            }`}
-    >
-        <div className="flex items-start gap-3">
-            <div
-                className={`p-2 rounded-button flex-shrink-0 ${isDark ? 'bg-indigo/15 text-indigo-light' : 'bg-sage/10 text-sage'
-                    }`}
-            >
-                {icon}
-            </div>
-            <div className="flex-1 min-w-0">
-                <h4
-                    className={`text-body font-semibold mb-1 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
-                        }`}
-                >
-                    {title}
-                </h4>
-                <p
-                    className={`text-small ${isDark ? 'text-text-dark-secondary' : 'text-text-light-secondary'
-                        }`}
-                >
-                    {description}
-                </p>
-                <p
-                    className={`text-caption mt-2 ${isDark ? 'text-text-dark-muted' : 'text-text-light-muted'
-                        }`}
-                >
-                    {time}
-                </p>
-            </div>
-        </div>
-    </div>
-);
-
-// Subject Block Component
-const SubjectBlock = ({ isDark, subject, color, className = '' }) => {
-    const colors = {
-        indigo: isDark ? 'bg-indigo/20 border-indigo/40' : 'bg-sage/20 border-sage/40',
-        teal: isDark ? 'bg-teal-500/20 border-teal-500/40' : 'bg-teal-600/20 border-teal-600/40',
-        purple: isDark ? 'bg-purple-500/20 border-purple-500/40' : 'bg-purple-600/20 border-purple-600/40',
-        orange: isDark ? 'bg-orange-500/20 border-orange-500/40' : 'bg-orange-600/20 border-orange-600/40',
-        blue: isDark ? 'bg-blue-500/20 border-blue-500/40' : 'bg-blue-600/20 border-blue-600/40',
-    };
-
-    return (
-        <div
-            className={`p-4 rounded-button border ${colors[color]} ${className}`}
-        >
-            <p
-                className={`text-small font-medium ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
-                    }`}
-            >
-                {subject}
-            </p>
-        </div>
-    );
-};
-
-// Why Card Component
 const WhyCard = ({ isDark, icon, title, description }) => (
     <div className="text-center">
         <div
@@ -354,7 +289,6 @@ const WhyCard = ({ isDark, icon, title, description }) => (
     </div>
 );
 
-// Feature Card Component
 const FeatureCard = ({ isDark, icon, title, description }) => (
     <div
         className={`rounded-card p-6 border transition-smooth-300 ${isDark

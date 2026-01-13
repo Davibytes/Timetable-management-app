@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { roomAPI } from '../services/api';
 import Button from './Button';
 import Input from './Input';
+import Dropdown from './Dropdown';
 
 const ROOM_TYPES = ['Lecture Hall', 'Laboratory', 'Amphitheater', 'Tutorial Room', 'Seminar Room', 'Other'];
 const EQUIPMENT_OPTIONS = [
@@ -108,8 +109,8 @@ const RoomForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
 
             <div
                 className={`relative w-full max-w-2xl mx-4 rounded-elevated p-8 animate-scale-in max-h-[90vh] overflow-y-auto ${isDark
-                        ? 'bg-dark-surface border border-dark-border-prominent shadow-modal-dark'
-                        : 'bg-light-surface border border-light-border-subtle shadow-modal-light'
+                    ? 'bg-dark-surface border border-dark-border-prominent shadow-modal-dark'
+                    : 'bg-light-surface border border-light-border-subtle shadow-modal-light'
                     }`}
             >
                 <div className="flex items-center justify-between mb-6 pb-4 border-b border-current opacity-20">
@@ -122,8 +123,8 @@ const RoomForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
                     <button
                         onClick={onClose}
                         className={`p-2 rounded-button transition-smooth ${isDark
-                                ? 'text-text-dark-muted hover:text-text-dark-primary hover:bg-white/10'
-                                : 'text-text-light-muted hover:text-text-light-primary hover:bg-black/5'
+                            ? 'text-text-dark-muted hover:text-text-dark-primary hover:bg-white/10'
+                            : 'text-text-light-muted hover:text-text-light-primary hover:bg-black/5'
                             }`}
                         aria-label="Close modal"
                     >
@@ -143,30 +144,17 @@ const RoomForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
                     />
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label
-                                className={`block text-small font-medium mb-2 ${isDark ? 'text-text-dark-primary' : 'text-text-light-primary'
-                                    }`}
-                            >
-                                Room Type <span className={isDark ? 'text-semantic-dark-error' : 'text-semantic-light-error'}>*</span>
-                            </label>
-                            <select
-                                name="type"
-                                value={formData.type}
-                                onChange={handleChange}
-                                className={`w-full px-4 py-3 rounded-input border transition-smooth ${isDark
-                                        ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary focus-ring-dark'
-                                        : 'bg-light-surface border-light-border-subtle text-text-light-primary focus-ring-light'
-                                    }`}
-                                required
-                            >
-                                {ROOM_TYPES.map(type => (
-                                    <option key={type} value={type}>
-                                        {type}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        <Dropdown
+                            label="Room Type"
+                            name="type"
+                            value={formData.type}
+                            onChange={handleChange}
+                            options={ROOM_TYPES.map(type => ({
+                                value: type,
+                                label: type
+                            }))}
+                            required
+                        />
 
                         <Input
                             label="Capacity"
@@ -215,12 +203,12 @@ const RoomForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
                                 <label
                                     key={item}
                                     className={`flex items-center gap-3 p-3 rounded-button border cursor-pointer transition-smooth ${formData.equipment.includes(item)
-                                            ? isDark
-                                                ? 'bg-indigo/15 border-indigo text-indigo-light'
-                                                : 'bg-sage/10 border-sage text-sage'
-                                            : isDark
-                                                ? 'bg-dark-elevated border-dark-border-subtle text-text-dark-secondary hover:border-dark-border-prominent'
-                                                : 'bg-light-elevated border-light-border-subtle text-text-light-secondary hover:border-light-border-prominent'
+                                        ? isDark
+                                            ? 'bg-indigo/15 border-indigo text-indigo-light'
+                                            : 'bg-sage/10 border-sage text-sage'
+                                        : isDark
+                                            ? 'bg-dark-elevated border-dark-border-subtle text-text-dark-secondary hover:border-dark-border-prominent'
+                                            : 'bg-light-elevated border-light-border-subtle text-text-light-secondary hover:border-light-border-prominent'
                                         }`}
                                 >
                                     <input
@@ -250,8 +238,8 @@ const RoomForm = ({ isOpen, onClose, onSuccess, editData = null }) => {
                             rows={3}
                             maxLength={300}
                             className={`w-full px-4 py-3 rounded-input border transition-smooth resize-none ${isDark
-                                    ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary placeholder:text-text-dark-muted focus-ring-dark'
-                                    : 'bg-light-surface border-light-border-subtle text-text-light-primary placeholder:text-text-light-muted focus-ring-light'
+                                ? 'bg-dark-surface border-dark-border-subtle text-text-dark-primary placeholder:text-text-dark-muted focus-ring-dark'
+                                : 'bg-light-surface border-light-border-subtle text-text-light-primary placeholder:text-text-light-muted focus-ring-light'
                                 }`}
                         />
                     </div>

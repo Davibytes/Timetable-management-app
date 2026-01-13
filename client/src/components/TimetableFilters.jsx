@@ -1,11 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { useTheme } from '../context/ThemeContext';
-import { X } from 'lucide-react';
+import { Filter, X } from 'lucide-react';
+import Dropdown from './Dropdown';
 
 const TimetableFilters = () => {
     const { entries = [], filters, updateFilters, resetFilters } = useTimetable();
     const { isDark } = useTheme();
+    const [showFilters, setShowFilters] = useState(false);
 
     const departments = useMemo(() => {
         const s = new Set();
@@ -43,116 +45,111 @@ const TimetableFilters = () => {
         return Array.from(s).sort();
     }, [entries]);
 
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-    const inputClass = isDark
-        ? 'w-full px-4 py-3 bg-dark-surface border border-dark-border-subtle rounded-input text-text-dark-primary placeholder:text-text-dark-muted focus:border-indigo focus:ring-2 focus:ring-indigo/20 transition-smooth outline-none'
-        : 'w-full px-4 py-3 bg-light-surface border border-light-border-subtle rounded-input text-text-light-primary placeholder:text-text-light-muted focus:border-sage focus:ring-2 focus:ring-sage/20 transition-smooth outline-none';
-
-    const labelClass = isDark ? 'text-text-dark-primary' : 'text-text-light-primary';
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     const hasActiveFilters = filters.department || filters.selectedCourse || filters.room || filters.lecturer || filters.dayOfWeek;
 
     return (
-        <div className={`rounded-card p-6 border ${isDark ? 'bg-dark-surface border-dark-border-subtle' : 'bg-light-surface border-light-border-subtle'
-            }`}>
-            <div className="flex items-center justify-between mb-4">
-                <h3 className={`text-h4 font-comfortaa font-semibold ${labelClass}`}>
-                    Filters
-                </h3>
+        <div className="mb-6">
+            {/* Filter Toggle Button */}
+            <div className="flex items-center gap-3 mb-4">
+                <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-button transition-smooth ${showFilters || hasActiveFilters
+                            ? isDark
+                                ? 'bg-indigo/15 text-indigo-light'
+                                : 'bg-sage/10 text-sage'
+                            : isDark
+                                ? 'text-text-dark-secondary hover:bg-white/5'
+                                : 'text-text-light-secondary hover:bg-black/5'
+                        }`}
+                >
+                    <Filter className="w-4 h-4" />
+                    <span className="text-small">Filters</span>
+                    {hasActiveFilters && (
+                        <span
+                            className={`w-2 h-2 rounded-full ${isDark ? 'bg-indigo-light' : 'bg-sage'
+                                }`}
+                        />
+                    )}
+                </button>
+
                 {hasActiveFilters && (
                     <button
-                        type="button"
                         onClick={() => {
                             resetFilters();
                             updateFilters({});
                         }}
-                        className={`flex items-center gap-2 text-small transition-smooth ${isDark
-                                ? 'text-text-dark-secondary hover:text-text-dark-primary'
-                                : 'text-text-light-secondary hover:text-text-light-primary'
+                        className={`flex items-center gap-2 px-3 py-2 rounded-button text-small transition-smooth ${isDark
+                                ? 'text-text-dark-muted hover:text-text-dark-primary hover:bg-white/5'
+                                : 'text-text-light-muted hover:text-text-light-primary hover:bg-black/5'
                             }`}
                     >
                         <X className="w-4 h-4" />
-                        Clear All
+                        Clear
                     </button>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                    <label className={`block text-small font-medium mb-2 ${labelClass}`}>
-                        Department
-                    </label>
-                    <select
-                        className={inputClass}
-                        value={filters.department || ''}
-                        onChange={e => updateFilters({ department: e.target.value })}
-                    >
-                        <option value="">All Departments</option>
-                        {departments.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                </div>
+            {/* Collapsible Filter Panel */}
+            {showFilters && (
+                <div
+                    className={`rounded-card p-4 border ${isDark
+                            ? 'bg-dark-surface border-dark-border-subtle'
+                            : 'bg-light-surface border-light-border-subtle'
+                        }`}
+                >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                        <Dropdown
+                            value={filters.department || ''}
+                            onChange={e => updateFilters({ department: e.target.value })}
+                            options={[
+                                { value: '', label: 'All Departments' },
+                                ...departments.map(d => ({ value: d, label: d }))
+                            ]}
+                        />
 
-                <div>
-                    <label className={`block text-small font-medium mb-2 ${labelClass}`}>
-                        Course
-                    </label>
-                    <select
-                        className={inputClass}
-                        value={filters.selectedCourse || ''}
-                        onChange={e => updateFilters({ selectedCourse: e.target.value })}
-                    >
-                        <option value="">All Courses</option>
-                        {courses.map(c => (
-                            <option key={c.code} value={c.code}>
-                                {c.code} {c.name ? `- ${c.name}` : ''}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                        <Dropdown
+                            value={filters.selectedCourse || ''}
+                            onChange={e => updateFilters({ selectedCourse: e.target.value })}
+                            options={[
+                                { value: '', label: 'All Courses' },
+                                ...courses.map(c => ({
+                                    value: c.code,
+                                    label: `${c.code}${c.name ? ` - ${c.name}` : ''}`
+                                }))
+                            ]}
+                        />
 
-                <div>
-                    <label className={`block text-small font-medium mb-2 ${labelClass}`}>
-                        Room
-                    </label>
-                    <select
-                        className={inputClass}
-                        value={filters.room || ''}
-                        onChange={e => updateFilters({ room: e.target.value })}
-                    >
-                        <option value="">All Rooms</option>
-                        {rooms.map(r => <option key={r} value={r}>{r}</option>)}
-                    </select>
-                </div>
+                        <Dropdown
+                            value={filters.room || ''}
+                            onChange={e => updateFilters({ room: e.target.value })}
+                            options={[
+                                { value: '', label: 'All Rooms' },
+                                ...rooms.map(r => ({ value: r, label: r }))
+                            ]}
+                        />
 
-                <div>
-                    <label className={`block text-small font-medium mb-2 ${labelClass}`}>
-                        Lecturer
-                    </label>
-                    <select
-                        className={inputClass}
-                        value={filters.lecturer || ''}
-                        onChange={e => updateFilters({ lecturer: e.target.value })}
-                    >
-                        <option value="">All Lecturers</option>
-                        {lecturers.map(l => <option key={l} value={l}>{l}</option>)}
-                    </select>
-                </div>
+                        <Dropdown
+                            value={filters.lecturer || ''}
+                            onChange={e => updateFilters({ lecturer: e.target.value })}
+                            options={[
+                                { value: '', label: 'All Lecturers' },
+                                ...lecturers.map(l => ({ value: l, label: l }))
+                            ]}
+                        />
 
-                <div>
-                    <label className={`block text-small font-medium mb-2 ${labelClass}`}>
-                        Day of Week
-                    </label>
-                    <select
-                        className={inputClass}
-                        value={filters.dayOfWeek || ''}
-                        onChange={e => updateFilters({ dayOfWeek: e.target.value })}
-                    >
-                        <option value="">All Days</option>
-                        {days.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
+                        <Dropdown
+                            value={filters.dayOfWeek || ''}
+                            onChange={e => updateFilters({ dayOfWeek: e.target.value })}
+                            options={[
+                                { value: '', label: 'All Days' },
+                                ...days.map(d => ({ value: d, label: d }))
+                            ]}
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
